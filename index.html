@@ -319,6 +319,16 @@
       background: transparent;
     }
 
+    .card.is-missing {
+      object-fit: contain;
+      padding: 10px;
+      color: rgba(35, 23, 0, 0.72);
+      background: #f8f0dc;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
     .card-back {
       object-fit: cover;
       background: #123c2d;
@@ -542,7 +552,9 @@
   <script>
     const suits = ["黑桃", "红桃", "梅花", "方片"];
     const ranks = ["A", "2", "3", "4", "5", "6", "7", "8", "9", "10"];
+    const imageExtensions = ["jpg", "jpeg", "png", "webp", "JPG", "JPEG", "PNG", "WEBP"];
     const backImage = "img/背面.jpg";
+    const backImageCandidates = ["img/背面.jpg", "img/背面.jpeg", "img/背面.png", "img/背面.webp", "img/背面.JPG", "img/背面.PNG"];
     const maxLives = 3;
 
     const state = {
@@ -581,16 +593,24 @@
     render();
 
     function createDeck() {
-      return suits.flatMap(suit => ranks.map(rank => ({
-        suit,
-        rank,
-        image: `img/${suit}${rank}.jpg`,
-        label: `${suit}${rank}`,
-      })));
+      return suits.flatMap(suit => ranks.map(rank => {
+        const label = `${suit}${rank}`;
+        const imageCandidates = imageExtensions.map(extension => `img/${label}.${extension}`);
+        return {
+          suit,
+          rank,
+          image: imageCandidates[0],
+          imageCandidates,
+          label,
+        };
+      }));
     }
 
     function preloadDeckImages() {
-      [...createDeck().map(card => card.image), backImage].forEach(src => {
+      [
+        ...createDeck().flatMap(card => card.imageCandidates.slice(0, 4)),
+        ...backImageCandidates,
+      ].forEach(src => {
         const image = new Image();
         image.src = src;
       });
@@ -607,7 +627,7 @@
         "img/图标.jpg",
         "icon.png",
         "icon.jpg",
-        backImage,
+        ...backImageCandidates,
       ];
       let index = 0;
       const tryNext = () => {
@@ -816,9 +836,9 @@
         const img = document.createElement("img");
         shell.className = `card-shell ${owner}-card${hidden ? " hidden-card back-card" : ""}${playerHole ? " player-hole-card" : ""}`;
         img.className = `card${hidden ? " card-back" : ""}`;
-        img.src = hidden ? backImage : card.image;
         img.alt = hidden ? "庄家暗牌" : playerHole ? `${card.label}，己方盖牌` : card.label;
         img.draggable = false;
+        setResilientImage(img, hidden ? backImageCandidates : card.imageCandidates, img.alt);
         shell.appendChild(img);
         if (!hidden) {
           shell.tabIndex = 0;
@@ -836,13 +856,34 @@
       });
     }
 
+
+    function setResilientImage(img, candidates, fallbackText) {
+      let index = 0;
+      img.classList.remove("is-missing");
+      img.removeAttribute("aria-label");
+      const tryNext = () => {
+        if (index >= candidates.length) {
+          img.removeAttribute("src");
+          img.classList.add("is-missing");
+          img.alt = `${fallbackText}（图片加载失败）`;
+          img.setAttribute("aria-label", `图片加载失败：${fallbackText}`);
+          return;
+        }
+        img.src = candidates[index];
+        index += 1;
+      };
+      img.addEventListener("error", tryNext);
+      img.addEventListener("load", () => img.classList.remove("is-missing"), { once: true });
+      tryNext();
+    }
+
     function inspectCard(card) {
       const overlay = document.createElement("div");
       const image = document.createElement("img");
       overlay.className = "inspect-overlay";
-      image.src = card.image;
       image.alt = `放大查看${card.label}`;
       image.draggable = false;
+      setResilientImage(image, card.imageCandidates, image.alt);
       overlay.appendChild(image);
       document.body.appendChild(overlay);
       overlay.addEventListener("click", () => overlay.remove(), { once: true });
@@ -853,9 +894,9 @@
         const overlay = document.createElement("div");
         const image = document.createElement("img");
         overlay.className = "draw-showcase";
-        image.src = card.image;
         image.alt = `抽到${card.label}`;
         image.draggable = false;
+        setResilientImage(image, card.imageCandidates, image.alt);
         overlay.appendChild(image);
         document.body.appendChild(overlay);
 
