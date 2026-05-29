@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#061b14" />
-  <title>次元赌局21点</title>
+  <title>致命21点</title>
   <style>
     :root {
       --bg: #061b14;
@@ -69,24 +69,35 @@
       align-items: center;
       gap: 9px;
       min-width: 0;
-      padding: 6px 11px 7px 7px;
-      border-radius: 18px;
+      padding: 7px 13px 8px 7px;
+      border-radius: 16px;
       background:
-        linear-gradient(135deg, rgba(255, 213, 106, 0.20), rgba(255,255,255,0.05) 45%, rgba(84, 227, 143, 0.10)),
-        rgba(0,0,0,0.18);
-      border: 1px solid rgba(255, 213, 106, 0.28);
-      box-shadow: 0 12px 28px rgba(0,0,0,0.24), inset 0 0 18px rgba(255,255,255,0.05);
+        linear-gradient(90deg, rgba(18, 8, 5, 0.96), rgba(56, 18, 14, 0.78) 48%, rgba(10, 38, 27, 0.72)),
+        rgba(0,0,0,0.28);
+      border: 1px solid rgba(255, 213, 106, 0.34);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.26), inset 0 0 18px rgba(255,213,106,0.07), 0 0 0 1px rgba(0,0,0,0.36);
+    }
+
+    .logo::before {
+      content: "";
+      position: absolute;
+      inset: 4px 6px 4px 58px;
+      border-top: 1px solid rgba(255, 213, 106, 0.24);
+      border-bottom: 1px solid rgba(255, 213, 106, 0.14);
+      border-radius: 12px;
+      pointer-events: none;
     }
 
     .logo::after {
-      content: "";
+      content: "DEADLY BLACKJACK";
       position: absolute;
-      left: 62px;
-      right: 12px;
-      bottom: 5px;
-      height: 2px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, rgba(255,213,106,0.9), rgba(255,255,255,0.1));
+      left: 64px;
+      bottom: 3px;
+      color: rgba(255, 107, 107, 0.48);
+      font-size: 8px;
+      font-weight: 1000;
+      letter-spacing: 0.18em;
+      pointer-events: none;
     }
 
     .logo-emblem {
@@ -118,26 +129,31 @@
     .logo-fallback { line-height: 1; filter: drop-shadow(0 2px 0 rgba(255,255,255,0.35)); }
 
     h1 {
+      position: relative;
+      z-index: 1;
       margin: 0;
-      font-size: clamp(25px, 7.2vw, 39px);
-      letter-spacing: 0.06em;
+      font-size: clamp(28px, 7.6vw, 42px);
+      letter-spacing: 0.08em;
       line-height: 0.95;
-      color: var(--gold);
-      font-family: "STKaiti", "KaiTi", "Microsoft YaHei", system-ui, sans-serif;
+      color: #fff3c0;
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
       font-weight: 1000;
       white-space: nowrap;
+      -webkit-text-stroke: 0.5px rgba(63, 20, 5, 0.85);
       text-shadow:
-        0 1px 0 #fff5bd,
-        0 3px 0 rgba(98, 54, 5, 0.8),
-        0 7px 14px rgba(0,0,0,0.38),
-        0 0 18px rgba(255, 213, 106, 0.28);
+        0 2px 0 #5a2107,
+        0 4px 0 rgba(0,0,0,0.72),
+        0 9px 16px rgba(0,0,0,0.45),
+        0 0 16px rgba(255, 213, 106, 0.28);
     }
 
     h1 .title-accent {
-      color: #fff7d0;
-      font-size: 0.74em;
-      margin-left: 0.03em;
-      text-shadow: 0 2px 0 rgba(98, 54, 5, 0.82), 0 0 12px rgba(255,213,106,0.34);
+      color: var(--gold);
+      font-size: 0.66em;
+      margin-left: 0.08em;
+      letter-spacing: 0.03em;
+      -webkit-text-stroke: 0.35px rgba(50, 16, 3, 0.9);
+      text-shadow: 0 2px 0 rgba(70, 24, 5, 0.92), 0 0 12px rgba(255,213,106,0.34);
     }
 
     .developer {
@@ -237,14 +253,28 @@
     }
 
     .avatar {
-      width: 32px;
-      height: 32px;
+      width: 34px;
+      height: 34px;
       display: inline-grid;
       place-items: center;
       border-radius: 50%;
-      background: rgba(0,0,0,0.24);
-      border: 1px solid rgba(255,255,255,0.18);
-      box-shadow: inset 0 0 12px rgba(255,213,106,0.06);
+      color: #fff2ca;
+      font-size: 18px;
+      font-weight: 1000;
+      background: radial-gradient(circle at 32% 24%, rgba(255,255,255,0.22), transparent 28%), linear-gradient(145deg, #27120c, #071910);
+      border: 1px solid rgba(255,213,106,0.34);
+      box-shadow: inset 0 0 12px rgba(255,213,106,0.08), 0 0 0 2px rgba(0,0,0,0.28), 0 7px 14px rgba(0,0,0,0.28);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.55), 0 0 8px rgba(255,107,107,0.45);
+    }
+
+    .dealer-avatar {
+      color: #ffd56a;
+      background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.24), transparent 26%), linear-gradient(145deg, #43200d, #071910 72%);
+    }
+
+    .player-avatar {
+      color: #eaffdc;
+      background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.22), transparent 26%), linear-gradient(145deg, #103d2d, #050f0b 74%);
     }
 
     .cards {
@@ -281,30 +311,27 @@
       display: grid;
       place-items: start center;
       padding-top: 9px;
-      color: rgba(255,255,255,0.96);
+      color: rgba(255,255,255,0.98);
       font-size: 12px;
       font-weight: 1000;
       letter-spacing: 0.12em;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.72), 0 0 8px rgba(255,213,106,0.54);
+      border-radius: inherit;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.75), 0 0 8px rgba(255,213,106,0.54);
       background:
-        linear-gradient(180deg, rgba(84, 88, 86, 0.74) 0%, rgba(106, 112, 108, 0.48) 31%, rgba(160, 164, 160, 0.20) 64%, rgba(255,255,255,0.03) 100%),
-        repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 8px);
-      border: 2px solid rgba(220,226,220,0.58);
-      box-shadow: inset 0 0 28px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.2);
+        linear-gradient(180deg, rgba(42, 46, 44, 0.70) 0%, rgba(80, 85, 82, 0.48) 42%, rgba(170, 174, 168, 0.18) 100%),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 8px);
+      box-shadow: inset 0 0 0 2px rgba(224,230,222,0.68), inset 0 0 30px rgba(0,0,0,0.34);
       pointer-events: none;
     }
 
     .card-shell.player-card.player-hole-card::after {
       content: "";
       position: absolute;
+      inset: 0;
       z-index: 3;
-      left: 14%;
-      right: 14%;
-      top: 34px;
-      height: 2px;
-      border-radius: 999px;
-      background: rgba(255,255,255,0.74);
-      box-shadow: 0 0 8px rgba(255,213,106,0.8);
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,0.62);
+      box-shadow: inset 0 0 16px rgba(255,255,255,0.13), 0 0 10px rgba(0,0,0,0.22);
       pointer-events: none;
     }
 
@@ -361,6 +388,14 @@
       font-size: clamp(18px, 5vw, 25px);
       font-weight: 900;
       color: var(--gold);
+    }
+
+    .message.typing::after {
+      content: "▌";
+      display: inline-block;
+      margin-left: 3px;
+      color: rgba(255, 213, 106, 0.9);
+      animation: cursor-blink 760ms steps(1) infinite;
     }
 
     .hint {
@@ -450,10 +485,12 @@
       object-fit: contain;
       background: transparent;
       border-radius: 18px;
-      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6), 0 0 0 4px rgba(255, 213, 106, 0.42);
     }
 
-    .draw-showcase img { animation: showcase-card 1300ms cubic-bezier(0.19, 1, 0.22, 1) both; }
+    .draw-showcase img {
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
+      animation: showcase-card 1300ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
 
     .inspect-overlay {
       position: fixed;
@@ -467,18 +504,26 @@
       cursor: zoom-out;
     }
 
-    .inspect-overlay img { animation: inspect-card 220ms ease-out both; }
+    .inspect-overlay img {
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.62);
+      animation: inspect-card 220ms ease-out both;
+    }
 
     @keyframes inspect-card {
       from { opacity: 0; transform: scale(0.58) rotateZ(-3deg); }
       to { opacity: 1; transform: scale(1) rotateZ(0deg); }
     }
 
+    @keyframes cursor-blink {
+      0%, 45% { opacity: 1; }
+      46%, 100% { opacity: 0; }
+    }
+
     @keyframes showcase-card {
-      0% { opacity: 0; transform: scale(0.36) rotateY(0deg) rotateZ(-10deg); }
-      20% { opacity: 1; }
-      72% { opacity: 1; transform: scale(1) rotateY(720deg) rotateZ(0deg); }
-      100% { opacity: 0; transform: scale(0.28) translateY(42vh) rotateY(720deg); }
+      0% { opacity: 0; transform: scale(0.36) rotateZ(-18deg); }
+      18% { opacity: 1; transform: scale(0.86) rotateZ(120deg); }
+      72% { opacity: 1; transform: scale(1) rotateZ(720deg); }
+      100% { opacity: 0; transform: scale(0.28) translateY(42vh) rotateZ(760deg); }
     }
 
     @media (max-width: 430px) {
@@ -503,12 +548,12 @@
 <body>
   <main class="app" aria-label="Blackjack 21点小游戏">
     <header>
-      <div class="logo" aria-label="次元赌局21点">
+      <div class="logo" aria-label="致命21点">
         <span class="logo-emblem">
           <img class="logo-icon" id="app-icon" alt="游戏图标" hidden>
           <span class="logo-fallback" id="logo-fallback">♠</span>
         </span>
-        <h1>次元赌局<span class="title-accent">21点</span></h1>
+        <h1>致命<span class="title-accent">21点</span></h1>
       </div>
       <div class="developer">开发者：兔兔酱</div>
     </header>
@@ -516,7 +561,7 @@
     <section class="table">
       <section class="zone" aria-labelledby="dealer-title">
         <div class="zone-header">
-          <div class="zone-title" id="dealer-title"><span class="avatar">♛</span> 次元庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
+          <div class="zone-title" id="dealer-title"><span class="avatar dealer-avatar">☠</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="dealer-score">?</span></div>
         </div>
         <div class="cards" id="dealer-cards" aria-label="庄家手牌"></div>
@@ -531,7 +576,7 @@
 
       <section class="zone" aria-labelledby="player-title">
         <div class="zone-header">
-          <div class="zone-title" id="player-title"><span class="avatar">✦</span> 挑战者 <span class="life-hearts" id="player-lives">❤❤❤</span></div>
+          <div class="zone-title" id="player-title"><span class="avatar player-avatar">⚔</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="player-score">0</span></div>
         </div>
         <div class="cards" id="player-cards" aria-label="玩家手牌"></div>
@@ -623,6 +668,10 @@
         "img/icon.png",
         "img/icon.jpg",
         "img/icon.jpeg",
+        "img/致命21点.png",
+        "img/致命21点.jpg",
+        "img/致命21点icon.png",
+        "img/致命21点icon.jpg",
         "img/图标.png",
         "img/图标.jpg",
         "icon.png",
@@ -713,17 +762,26 @@
       state.dealerHidden = false;
       render();
 
+      let dealerDrew = false;
       while (dealerWantsCard()) {
-        await wait(450);
-        state.dealer.push(draw());
+        dealerDrew = true;
+        await wait(420);
+        const card = draw();
+        await showcaseCard(card, { hidden: true, alt: "庄家抽牌" });
+        state.dealer.push(card);
         render();
       }
 
-      const playerTotal = handValue(state.player).total;
       const dealerTotal = handValue(state.dealer).total;
-      if (dealerTotal > 21) finishRound("win", "庄家选择要牌后爆牌，庄家扣1颗生命。", false);
-      else if (playerTotal > dealerTotal) finishRound("win", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，庄家扣1颗生命。`, false);
-      else if (playerTotal < dealerTotal) finishRound("lose", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，你扣1颗生命。`, false);
+      if (!dealerDrew && dealerTotal <= 21) {
+        await typeCenterMessage("庄家选择停牌", "对方正在等待最终比较……", 1500);
+      }
+
+      const playerTotal = handValue(state.player).total;
+      const finalDealerTotal = handValue(state.dealer).total;
+      if (finalDealerTotal > 21) finishRound("win", "庄家选择要牌后爆牌，庄家扣1颗生命。", false);
+      else if (playerTotal > finalDealerTotal) finishRound("win", `你 ${playerTotal} 点，庄家 ${finalDealerTotal} 点，庄家扣1颗生命。`, false);
+      else if (playerTotal < finalDealerTotal) finishRound("lose", `你 ${playerTotal} 点，庄家 ${finalDealerTotal} 点，你扣1颗生命。`, false);
       else finishRound("push", `双方都是 ${playerTotal} 点，平局，不扣生命。`, false);
       state.animating = false;
       render();
@@ -805,8 +863,21 @@
 
     function setMessage(message, hint, resetClass = true) {
       if (resetClass) elements.message.className = "message";
+      elements.message.classList.remove("typing");
       elements.message.textContent = message;
       elements.hint.textContent = hint;
+    }
+
+    async function typeCenterMessage(message, hint = "", holdMs = 1400) {
+      elements.message.className = "message typing";
+      elements.message.textContent = "";
+      elements.hint.textContent = hint;
+      for (const char of message) {
+        elements.message.textContent += char;
+        await wait(95);
+      }
+      await wait(holdMs);
+      elements.message.classList.remove("typing");
     }
 
     function render() {
@@ -889,14 +960,15 @@
       overlay.addEventListener("click", () => overlay.remove(), { once: true });
     }
 
-    function showcaseCard(card) {
+    function showcaseCard(card, options = {}) {
       return new Promise(resolve => {
         const overlay = document.createElement("div");
         const image = document.createElement("img");
         overlay.className = "draw-showcase";
-        image.alt = `抽到${card.label}`;
+        image.alt = options.alt || `抽到${card.label}`;
         image.draggable = false;
-        setResilientImage(image, card.imageCandidates, image.alt);
+        if (options.hidden) image.classList.add("card-back");
+        setResilientImage(image, options.hidden ? backImageCandidates : card.imageCandidates, image.alt);
         overlay.appendChild(image);
         document.body.appendChild(overlay);
 
