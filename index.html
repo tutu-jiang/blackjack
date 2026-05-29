@@ -252,6 +252,23 @@
       text-shadow: 0 2px 0 rgba(0,0,0,0.35);
     }
 
+    .turn-badge {
+      display: none;
+      margin-left: 4px;
+      padding: 6px 9px;
+      border: 4px solid #020b08;
+      background: rgba(7, 50, 36, 0.96);
+      color: #fff8e8;
+      font-size: 16px;
+      font-weight: 1000;
+      letter-spacing: 0.03em;
+      line-height: 1;
+      box-shadow: 0 0 0 1px rgba(255, 213, 106, 0.18), 0 8px 16px rgba(0,0,0,0.28);
+      text-shadow: none;
+    }
+
+    .turn-badge.active { display: inline-flex; }
+
     .avatar {
       width: 34px;
       height: 34px;
@@ -476,20 +493,59 @@
       pointer-events: none;
     }
 
-    .draw-showcase img,
+    .showcase-card,
     .inspect-overlay img {
       width: min(68vw, 360px);
       min-width: 230px;
       max-height: 76svh;
       aspect-ratio: 0.69;
-      object-fit: contain;
       background: transparent;
       border-radius: 18px;
     }
 
-    .draw-showcase img {
+    .showcase-card {
+      position: relative;
+      transform-style: preserve-3d;
       box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
       animation: showcase-card 1300ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+
+    .showcase-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: inherit;
+      background: transparent;
+      backface-visibility: hidden;
+    }
+
+    .showcase-card .showcase-back { transform: rotateY(180deg); }
+
+    .deal-flight {
+      --target-y: 0px;
+      position: fixed;
+      z-index: 29;
+      width: clamp(78px, 23vw, 116px);
+      aspect-ratio: 0.69;
+      right: -140px;
+      top: 48%;
+      pointer-events: none;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,0.44));
+      animation: fly-card-in 820ms cubic-bezier(0.17, 0.84, 0.32, 1.08) both;
+    }
+
+    .deal-flight.deal-to-dealer { --target-y: -24vh; }
+    .deal-flight.deal-to-player { --target-y: 24vh; }
+
+    .deal-flight img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 10px;
     }
 
     .inspect-overlay {
@@ -520,10 +576,18 @@
     }
 
     @keyframes showcase-card {
-      0% { opacity: 0; transform: scale(0.36) rotateZ(-18deg); }
-      18% { opacity: 1; transform: scale(0.86) rotateZ(120deg); }
-      72% { opacity: 1; transform: scale(1) rotateZ(720deg); }
-      100% { opacity: 0; transform: scale(0.28) translateY(42vh) rotateZ(760deg); }
+      0% { opacity: 0; transform: scale(0.36) rotateY(0deg) rotateZ(-10deg); }
+      20% { opacity: 1; }
+      72% { opacity: 1; transform: scale(1) rotateY(720deg) rotateZ(0deg); }
+      100% { opacity: 0; transform: scale(0.28) translateY(42vh) rotateY(720deg); }
+    }
+
+    @keyframes fly-card-in {
+      0% { opacity: 0; transform: translate(0, -18px) rotate(20deg) scale(0.72); }
+      16% { opacity: 1; }
+      46% { opacity: 1; transform: translate(calc(-50vw - 18px), 0) rotate(-8deg) scale(1.06); }
+      72% { opacity: 1; transform: translate(calc(-50vw - 34px), var(--target-y)) rotate(4deg) scale(1); }
+      100% { opacity: 0; transform: translate(calc(-50vw - 48px), var(--target-y)) rotate(0deg) scale(0.92); }
     }
 
     @media (max-width: 430px) {
@@ -561,7 +625,7 @@
     <section class="table">
       <section class="zone" aria-labelledby="dealer-title">
         <div class="zone-header">
-          <div class="zone-title" id="dealer-title"><span class="avatar dealer-avatar">☠</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
+          <div class="zone-title" id="dealer-title"><span class="avatar dealer-avatar">☠</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span><span class="turn-badge" id="dealer-turn">庄家回合</span></div>
           <div class="score-pill">点数：<span id="dealer-score">?</span></div>
         </div>
         <div class="cards" id="dealer-cards" aria-label="庄家手牌"></div>
@@ -576,7 +640,7 @@
 
       <section class="zone" aria-labelledby="player-title">
         <div class="zone-header">
-          <div class="zone-title" id="player-title"><span class="avatar player-avatar">⚔</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span></div>
+          <div class="zone-title" id="player-title"><span class="avatar player-avatar">⚔</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span><span class="turn-badge" id="player-turn">我的回合</span></div>
           <div class="score-pill">点数：<span id="player-score">0</span></div>
         </div>
         <div class="cards" id="player-cards" aria-label="玩家手牌"></div>
@@ -586,11 +650,11 @@
     <nav class="controls" aria-label="游戏操作">
       <button id="deal-button">发牌</button>
       <button id="hit-button" class="secondary" disabled>要牌</button>
-      <button id="stand-button" class="secondary" disabled>停牌</button>
+      <button id="stand-button" class="secondary" disabled>结束回合</button>
     </nav>
 
     <section class="rules">
-      <strong>当前规则：</strong>①牌组只使用A-10四种花色共40张，没有J/Q/K/大小王。②A可算1或11。③双方都选择停牌时比较大小。
+      <strong>当前规则：</strong>①数字牌只使用A-10四种花色共40张，没有J/Q/K/大小王。②A可算1或11。③每个回合只能抽1张数字牌，点击“结束回合”后切换至庄家回合。④双方都结束回合且不再抽牌时比较大小。
     </section>
   </main>
 
@@ -601,11 +665,17 @@
     const backImage = "img/背面.jpg";
     const backImageCandidates = ["img/背面.jpg", "img/背面.jpeg", "img/背面.png", "img/背面.webp", "img/背面.JPG", "img/背面.PNG"];
     const maxLives = 3;
+    // 术语预留：A-10 扑克牌称为“数字牌”；未来加入的特殊卡称为“技能牌”。
+    // 未来技能牌规则预留：每回合抽数字牌前有 30% 概率先抽 1 张技能牌，每回合最多触发 1 次。
+    const skillCardChanceBeforeNumberCard = 0.3;
 
     const state = {
       deck: [],
+      skillDeck: [],
       player: [],
       dealer: [],
+      playerSkills: [],
+      dealerSkills: [],
       roundActive: false,
       dealerHidden: true,
       playerHoleIndex: 1,
@@ -613,6 +683,13 @@
       dealerLives: maxLives,
       gameOver: false,
       animating: false,
+      turn: "none",
+      playerDrewThisTurn: false,
+      dealerDrewThisTurn: false,
+      playerEndedCleanly: false,
+      dealerEndedCleanly: false,
+      playerSkillDrawnThisTurn: false,
+      dealerSkillDrawnThisTurn: false,
     };
 
     const elements = {
@@ -627,11 +704,13 @@
       standButton: document.querySelector("#stand-button"),
       playerLives: document.querySelector("#player-lives"),
       dealerLives: document.querySelector("#dealer-lives"),
+      playerTurn: document.querySelector("#player-turn"),
+      dealerTurn: document.querySelector("#dealer-turn"),
     };
 
     elements.dealButton.addEventListener("click", startRound);
     elements.hitButton.addEventListener("click", playerHit);
-    elements.standButton.addEventListener("click", playerStand);
+    elements.standButton.addEventListener("click", endPlayerTurn);
 
     preloadDeckImages();
     loadAppIcon();
@@ -649,6 +728,19 @@
           label,
         };
       }));
+    }
+
+    function createSkillDeck() {
+      // 未来把技能牌素材和效果配置到这里；当前还没有技能牌，所以返回空牌组。
+      return [];
+    }
+
+    function dealInitialSkillCards() {
+      const skills = [];
+      while (skills.length < 2 && state.skillDeck.length) {
+        skills.push(state.skillDeck.pop());
+      }
+      return skills;
     }
 
     function preloadDeckImages() {
@@ -710,20 +802,49 @@
       return value[0] % maxExclusive;
     }
 
-    function startRound() {
+    async function startRound() {
       if (state.gameOver) resetMatch();
       if (state.roundActive || state.animating) return;
 
+      state.animating = true;
+      state.turn = "none";
       state.deck = shuffle(createDeck());
-      state.player = [draw(), draw()];
-      state.dealer = [draw(), draw()];
-      state.roundActive = true;
+      state.skillDeck = shuffle(createSkillDeck());
+      state.player = [];
+      state.dealer = [];
+      state.playerSkills = dealInitialSkillCards();
+      state.dealerSkills = dealInitialSkillCards();
       state.dealerHidden = true;
-      setMessage("你的回合：要牌还是停牌？", "你的第二张牌会以灰色遮罩标记为己方盖牌，双方都停牌后比较大小。", true);
+      resetTurnFlags();
+      state.playerEndedCleanly = false;
+      state.dealerEndedCleanly = false;
+      setMessage("发牌中", "数字牌将从牌桌右侧依次进入。", true);
+      render();
+
+      const initialDeal = [
+        { owner: "player", card: drawNumberCard(), hidden: false },
+        { owner: "dealer", card: drawNumberCard(), hidden: false },
+        { owner: "player", card: drawNumberCard(), hidden: false },
+        { owner: "dealer", card: drawNumberCard(), hidden: true },
+      ];
+
+      for (const deal of initialDeal) {
+        await dealCardToTable(deal.card, deal.hidden, deal.owner);
+        state[deal.owner].push(deal.card);
+        render();
+        await wait(150);
+      }
+
+      state.roundActive = true;
+      state.animating = false;
+      state.turn = "player";
+      resetTurnFlags();
+      setMessage("我的决策", "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。", true);
 
       const playerBlackjack = isBlackjack(state.player);
       const dealerBlackjack = isBlackjack(state.dealer);
       if (playerBlackjack || dealerBlackjack) {
+        state.turn = "none";
         state.dealerHidden = false;
         if (playerBlackjack && dealerBlackjack) finishRound("push", "双方都是 Blackjack，平局，不扣生命。", false);
         else if (playerBlackjack) finishRound("win", "Blackjack！庄家扣1颗生命。", false);
@@ -734,57 +855,91 @@
     }
 
     async function playerHit() {
-      if (!state.roundActive || state.animating) return;
+      if (!state.roundActive || state.animating || state.turn !== "player" || state.playerDrewThisTurn) return;
       state.animating = true;
       render();
 
-      const card = draw();
+      const card = drawNumberCard();
       await showcaseCard(card);
       state.player.push(card);
+      state.playerDrewThisTurn = true;
+      state.playerEndedCleanly = false;
       state.animating = false;
 
       const score = handValue(state.player).total;
       if (score > 21) {
         state.dealerHidden = false;
         finishRound("lose", "你爆牌了，扣1颗生命。", false);
-      } else if (score === 21) {
-        playerStand();
-        return;
       } else {
-        setMessage("继续决策", "你的点数还没超过21，可以继续要牌，也可以选择停牌；双方都停牌后比较大小。", true);
+        setMessage("我的决策", "本回合已抽1张数字牌，要牌按钮已锁定；你仍可使用技能牌，或点击“结束回合”。", true);
       }
       render();
     }
 
-    async function playerStand() {
-      if (!state.roundActive || state.animating) return;
+    async function endPlayerTurn() {
+      if (!state.roundActive || state.animating || state.turn !== "player") return;
       state.animating = true;
-      state.dealerHidden = false;
+      state.turn = "dealer";
+      state.playerEndedCleanly = !state.playerDrewThisTurn;
       render();
+      await runDealerTurn();
+    }
 
-      let dealerDrew = false;
-      while (dealerWantsCard()) {
-        dealerDrew = true;
-        await wait(420);
-        const card = draw();
+    async function runDealerTurn() {
+      state.dealerDrewThisTurn = false;
+      state.dealerSkillDrawnThisTurn = false;
+
+      if (dealerWantsCard()) {
+        const card = drawNumberCard();
+        await showDealerDecision("庄家选择要牌");
         await showcaseCard(card, { hidden: true, alt: "庄家抽牌" });
         state.dealer.push(card);
+        state.dealerDrewThisTurn = true;
+        state.dealerEndedCleanly = false;
         render();
+      } else {
+        await showDealerDecision("庄家选择停牌");
+        state.dealerEndedCleanly = true;
       }
 
       const dealerTotal = handValue(state.dealer).total;
-      if (!dealerDrew && dealerTotal <= 21) {
-        await typeCenterMessage("庄家选择停牌", "对方正在等待最终比较……", 1500);
+      if (dealerTotal > 21) {
+        state.dealerHidden = false;
+        finishRound("win", "庄家选择要牌后爆牌，庄家扣1颗生命。", false);
+        state.animating = false;
+        render();
+        return;
       }
 
-      const playerTotal = handValue(state.player).total;
-      const finalDealerTotal = handValue(state.dealer).total;
-      if (finalDealerTotal > 21) finishRound("win", "庄家选择要牌后爆牌，庄家扣1颗生命。", false);
-      else if (playerTotal > finalDealerTotal) finishRound("win", `你 ${playerTotal} 点，庄家 ${finalDealerTotal} 点，庄家扣1颗生命。`, false);
-      else if (playerTotal < finalDealerTotal) finishRound("lose", `你 ${playerTotal} 点，庄家 ${finalDealerTotal} 点，你扣1颗生命。`, false);
-      else finishRound("push", `双方都是 ${playerTotal} 点，平局，不扣生命。`, false);
+      if (state.playerEndedCleanly && state.dealerEndedCleanly) {
+        compareHands();
+        state.animating = false;
+        render();
+        return;
+      }
+
+      state.turn = "player";
+      resetTurnFlags();
       state.animating = false;
+      setMessage("我的决策", "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。", true);
       render();
+    }
+
+    function resetTurnFlags() {
+      state.playerDrewThisTurn = false;
+      state.dealerDrewThisTurn = false;
+      state.playerSkillDrawnThisTurn = false;
+      state.dealerSkillDrawnThisTurn = false;
+    }
+
+    function compareHands() {
+      state.turn = "none";
+      state.dealerHidden = false;
+      const playerTotal = handValue(state.player).total;
+      const dealerTotal = handValue(state.dealer).total;
+      if (playerTotal > dealerTotal) finishRound("win", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，庄家扣1颗生命。`, false);
+      else if (playerTotal < dealerTotal) finishRound("lose", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，你扣1颗生命。`, false);
+      else finishRound("push", `双方都是 ${playerTotal} 点，平局，不扣生命。`, false);
     }
 
     function dealerWantsCard() {
@@ -803,7 +958,7 @@
       return card.rank === "A" ? 1 : Number(card.rank);
     }
 
-    function draw() {
+    function drawNumberCard() {
       if (!state.deck.length) state.deck = shuffle(createDeck());
       return state.deck.pop();
     }
@@ -832,6 +987,7 @@
 
     function finishRound(result, text, resetAnimation = true) {
       state.roundActive = false;
+      state.turn = "none";
       if (resetAnimation) state.animating = false;
 
       if (result === "win") state.dealerLives = Math.max(0, state.dealerLives - 1);
@@ -855,9 +1011,16 @@
       state.gameOver = false;
       state.roundActive = false;
       state.dealerHidden = true;
+      state.turn = "none";
+      resetTurnFlags();
+      state.playerEndedCleanly = false;
+      state.dealerEndedCleanly = false;
       state.player = [];
       state.dealer = [];
+      state.playerSkills = [];
+      state.dealerSkills = [];
       state.deck = [];
+      state.skillDeck = [];
       setMessage("新的一场开始", "牌组只有A-10共40张，A可算1或11。", true);
     }
 
@@ -890,12 +1053,15 @@
         : "?";
 
       elements.dealButton.textContent = state.gameOver ? "重新开始" : state.player.length ? "下一局" : "发牌";
+      elements.standButton.textContent = "结束回合";
       elements.dealButton.disabled = state.roundActive || state.animating;
-      elements.hitButton.disabled = !state.roundActive || state.animating;
-      elements.standButton.disabled = !state.roundActive || state.animating;
+      elements.hitButton.disabled = !state.roundActive || state.animating || state.turn !== "player" || state.playerDrewThisTurn;
+      elements.standButton.disabled = !state.roundActive || state.animating || state.turn !== "player";
 
       elements.playerLives.textContent = hearts(state.playerLives);
       elements.dealerLives.textContent = hearts(state.dealerLives);
+      elements.playerTurn.classList.toggle("active", state.turn === "player");
+      elements.dealerTurn.classList.toggle("active", state.turn === "dealer");
     }
 
     function renderHand(container, hand, hideSecondCard = false, owner = "player", playerHoleIndex = -1) {
@@ -924,6 +1090,33 @@
           });
         }
         container.appendChild(shell);
+      });
+    }
+
+    function showDealerDecision(decisionText) {
+      setMessage("庄家决策", decisionText, true);
+      render();
+      return wait(5000);
+    }
+
+    function dealCardToTable(card, hidden = false, owner = "player") {
+      return new Promise(resolve => {
+        const flyer = document.createElement("div");
+        const image = document.createElement("img");
+        flyer.className = `deal-flight deal-to-${owner}`;
+        image.alt = hidden ? "发出庄家暗牌" : `发出${card.label}`;
+        image.draggable = false;
+        if (hidden) image.classList.add("card-back");
+        setResilientImage(image, hidden ? backImageCandidates : card.imageCandidates, image.alt);
+        flyer.appendChild(image);
+        document.body.appendChild(flyer);
+
+        const cleanup = () => {
+          flyer.remove();
+          resolve();
+        };
+        flyer.addEventListener("animationend", cleanup, { once: true });
+        setTimeout(cleanup, 950);
       });
     }
 
@@ -963,13 +1156,22 @@
     function showcaseCard(card, options = {}) {
       return new Promise(resolve => {
         const overlay = document.createElement("div");
-        const image = document.createElement("img");
+        const showcase = document.createElement("div");
+        const front = document.createElement("img");
+        const back = document.createElement("img");
+        const alt = options.alt || `抽到${card.label}`;
         overlay.className = "draw-showcase";
-        image.alt = options.alt || `抽到${card.label}`;
-        image.draggable = false;
-        if (options.hidden) image.classList.add("card-back");
-        setResilientImage(image, options.hidden ? backImageCandidates : card.imageCandidates, image.alt);
-        overlay.appendChild(image);
+        showcase.className = "showcase-card";
+        front.alt = alt;
+        back.alt = "";
+        front.draggable = false;
+        back.draggable = false;
+        back.className = "showcase-back";
+        const frontCandidates = options.hidden ? backImageCandidates : card.imageCandidates;
+        setResilientImage(front, frontCandidates, alt);
+        setResilientImage(back, backImageCandidates, "卡牌背面");
+        showcase.append(front, back);
+        overlay.appendChild(showcase);
         document.body.appendChild(overlay);
 
         let done = false;
@@ -979,7 +1181,7 @@
           overlay.remove();
           resolve();
         };
-        image.addEventListener("animationend", cleanup, { once: true });
+        showcase.addEventListener("animationend", cleanup, { once: true });
         setTimeout(cleanup, 1500);
       });
     }
@@ -994,7 +1196,8 @@
 
     function visibleDealerScore() {
       if (!state.dealer.length) return "?";
-      return `${handValue([state.dealer[0]]).total}+?`;
+      const visibleCards = state.dealer.filter((_, index) => index !== 1);
+      return `${handValue(visibleCards).total}+?`;
     }
   </script>
 </body>
