@@ -4,7 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <meta name="theme-color" content="#061b14" />
-  <title>Blackjack 21点</title>
+  <title>次元赌局21点</title>
   <style>
     :root {
       --bg: #061b14;
@@ -53,19 +53,22 @@
 
     h1 {
       margin: 0;
-      font-size: clamp(26px, 7vw, 40px);
+      font-size: clamp(28px, 8vw, 42px);
       letter-spacing: 0.03em;
       line-height: 1;
       text-shadow: 0 3px 0 rgba(0,0,0,0.35);
     }
 
-    .tagline {
-      margin-top: 5px;
-      color: var(--muted);
-      font-size: 13px;
+    .developer {
+      color: var(--gold);
+      font-size: clamp(13px, 3.2vw, 16px);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.32);
+      white-space: nowrap;
     }
 
-    .match-pill, .score-pill {
+    .score-pill {
       border: 1px solid rgba(255, 213, 106, 0.35);
       background: rgba(0,0,0,0.22);
       border-radius: 999px;
@@ -75,24 +78,12 @@
       white-space: nowrap;
     }
 
-    .match-pill {
-      display: grid;
-      gap: 3px;
-      min-width: 112px;
-      font-size: 13px;
-    }
-
-    .heart-line {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px;
-    }
-
-    .hearts {
+    .life-hearts {
+      margin-left: 4px;
       color: var(--danger);
-      letter-spacing: 0.06em;
-      text-shadow: 0 2px 0 rgba(0,0,0,0.28);
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.32);
     }
 
     .table {
@@ -165,19 +156,42 @@
       flex-wrap: wrap;
     }
 
-    .card {
+    .card-shell {
+      position: relative;
       width: clamp(76px, 23vw, 116px);
       aspect-ratio: 0.69;
       border-radius: 10px;
-      object-fit: cover;
       background: #f8f0dc;
       box-shadow: 0 8px 18px rgba(0,0,0,0.42);
       transform-origin: bottom center;
       animation: deal 240ms ease-out both;
+      overflow: hidden;
+      cursor: zoom-in;
     }
 
-    .card:nth-child(2n) { transform: translateY(4px) rotate(1.5deg); }
-    .card:nth-child(3n) { transform: translateY(-3px) rotate(-1.5deg); }
+    .card-shell:nth-child(2n) { transform: translateY(4px) rotate(1.5deg); }
+    .card-shell:nth-child(3n) { transform: translateY(-3px) rotate(-1.5deg); }
+
+    .card-shell.player-card.hidden-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 34%;
+      z-index: 1;
+      background: rgba(120, 128, 126, 0.22);
+      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+      pointer-events: none;
+    }
+
+    .card-shell.hidden-card { cursor: default; }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #f8f0dc;
+    }
 
     @keyframes deal {
       from { opacity: 0; transform: translateY(-18px) scale(0.92) rotate(-5deg); }
@@ -285,15 +299,41 @@
       pointer-events: none;
     }
 
-    .draw-showcase img {
+    .draw-showcase img,
+    .inspect-overlay img {
       width: min(68vw, 360px);
       min-width: 230px;
       max-height: 76svh;
       aspect-ratio: 0.69;
-      object-fit: cover;
+      object-fit: contain;
+      background: #f8f0dc;
       border-radius: 18px;
       box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6), 0 0 0 4px rgba(255, 213, 106, 0.42);
+    }
+
+    .draw-showcase img {
       animation: showcase-card 1300ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+
+    .inspect-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 31;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(5px);
+      cursor: zoom-out;
+    }
+
+    .inspect-overlay img {
+      animation: inspect-card 220ms ease-out both;
+    }
+
+    @keyframes inspect-card {
+      from { opacity: 0; transform: scale(0.58) rotateZ(-3deg); }
+      to { opacity: 1; transform: scale(1) rotateZ(0deg); }
     }
 
     @keyframes showcase-card {
@@ -307,12 +347,12 @@
       .table { min-height: 600px; }
       .zone { min-height: 182px; }
       .cards { min-height: 132px; }
-      .card { width: clamp(68px, 20vw, 94px); }
+      .card-shell { width: clamp(68px, 20vw, 94px); }
       .center-panel { min-height: 84px; padding: 10px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
-      .card, .draw-showcase img { animation-duration: 1ms; }
+      .card-shell, .draw-showcase img, .inspect-overlay img { animation-duration: 1ms; }
     }
   </style>
 </head>
@@ -320,19 +360,15 @@
   <main class="app" aria-label="Blackjack 21点小游戏">
     <header>
       <div>
-        <h1>BLACKJACK</h1>
-        <div class="tagline">玩家 vs 人机庄家 · 三颗生命 · 40张A-10牌组</div>
+        <h1>次元赌局21点</h1>
       </div>
-      <div class="match-pill" aria-live="polite">
-        <div class="heart-line">玩家 <span class="hearts" id="player-lives">❤❤❤</span></div>
-        <div class="heart-line">庄家 <span class="hearts" id="dealer-lives">❤❤❤</span></div>
-      </div>
+      <div class="developer">开发者：兔兔酱</div>
     </header>
 
     <section class="table">
       <section class="zone" aria-labelledby="dealer-title">
         <div class="zone-header">
-          <div class="zone-title" id="dealer-title"><span class="avatar">🤖</span> 庄家</div>
+          <div class="zone-title" id="dealer-title"><span class="avatar">🤖</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="dealer-score">?</span></div>
         </div>
         <div class="cards" id="dealer-cards" aria-label="庄家手牌"></div>
@@ -341,13 +377,13 @@
       <section class="center-panel" aria-live="polite">
         <div>
           <p class="message" id="message">点击“发牌”开始第一局</p>
-          <p class="hint" id="hint">双方各有3颗生命。每输一局扣1颗，谁先失去3颗生命谁输掉整场游戏。</p>
+          <p class="hint" id="hint">双方起始3颗❤，每输一局扣1颗，归0输掉比赛。</p>
         </div>
       </section>
 
       <section class="zone" aria-labelledby="player-title">
         <div class="zone-header">
-          <div class="zone-title" id="player-title"><span class="avatar">🧑</span> 玩家</div>
+          <div class="zone-title" id="player-title"><span class="avatar">🧑</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="player-score">0</span></div>
         </div>
         <div class="cards" id="player-cards" aria-label="玩家手牌"></div>
@@ -361,7 +397,7 @@
     </nav>
 
     <section class="rules">
-      <strong>当前规则：</strong>双方各有3颗生命；每输一局扣1颗生命，平局不扣；谁先归零谁输掉整场游戏。牌组只使用A-10四种花色共40张，J/Q/K和大小王不参与；A可算1或11；玩家和庄家都可以在自己的回合选择要牌或停牌，庄家不再受“16点以下必须要牌、17点以上停牌”的固定规则限制。
+      <strong>当前规则：</strong>①双方起始3颗❤，每输一局扣1颗，归0输掉比赛。②牌组只使用A-10四种花色共40张，J/Q/K和大小王不参与。③A可算1或11。④双方都选择停牌时比较大小。
     </section>
   </main>
 
@@ -447,7 +483,7 @@
       state.dealer = [draw(), draw()];
       state.roundActive = true;
       state.dealerHidden = true;
-      setMessage("你的回合：要牌还是停牌？", "本版只使用A-10共40张牌。你可以根据已出现的牌估算剩余牌和庄家暗牌。", true);
+      setMessage("你的回合：要牌还是停牌？", "双方都选择停牌时比较大小。你可以根据A-10共40张牌估算剩余牌和庄家暗牌。", true);
 
       const playerBlackjack = isBlackjack(state.player);
       const dealerBlackjack = isBlackjack(state.dealer);
@@ -479,7 +515,7 @@
         playerStand();
         return;
       } else {
-        setMessage("继续决策", "你的点数还没超过21，可以继续要牌，也可以停牌交给庄家。蓋牌仍然保密。", true);
+        setMessage("继续决策", "你的点数还没超过21，可以继续要牌，也可以选择停牌；双方都停牌后比较大小。", true);
       }
       render();
     }
@@ -577,7 +613,7 @@
       state.player = [];
       state.dealer = [];
       state.deck = [];
-      setMessage("新的一场开始", "双方生命恢复为3颗。点击“发牌”开始第一局。", true);
+      setMessage("新的一场开始", "双方起始3颗❤，每输一局扣1颗，归0输掉比赛。", true);
     }
 
     function setMessage(message, hint, resetClass = true) {
@@ -587,8 +623,8 @@
     }
 
     function render() {
-      renderHand(elements.playerCards, state.player);
-      renderHand(elements.dealerCards, state.dealer, state.dealerHidden);
+      renderHand(elements.playerCards, state.player, false, "player");
+      renderHand(elements.dealerCards, state.dealer, state.dealerHidden, "dealer");
 
       elements.playerScore.textContent = state.player.length ? handValue(state.player).total : 0;
       elements.dealerScore.textContent = state.dealer.length
@@ -604,17 +640,44 @@
       elements.dealerLives.textContent = hearts(state.dealerLives);
     }
 
-    function renderHand(container, hand, hideSecondCard = false) {
+    function renderHand(container, hand, hideSecondCard = false, owner = "player") {
       container.innerHTML = "";
       hand.forEach((card, index) => {
-        const img = document.createElement("img");
         const hidden = hideSecondCard && index === 1;
+        const shell = document.createElement("div");
+        const img = document.createElement("img");
+        shell.className = `card-shell ${owner}-card${hidden ? " hidden-card" : ""}`;
         img.className = "card";
         img.src = hidden ? backImage : card.image;
         img.alt = hidden ? "庄家暗牌" : card.label;
         img.draggable = false;
-        container.appendChild(img);
+        shell.appendChild(img);
+        if (!hidden) {
+          shell.tabIndex = 0;
+          shell.setAttribute("role", "button");
+          shell.setAttribute("aria-label", `放大查看${card.label}`);
+          shell.addEventListener("click", () => inspectCard(card));
+          shell.addEventListener("keydown", event => {
+            if (event.key === "Enter" || event.key === " ") {
+              event.preventDefault();
+              inspectCard(card);
+            }
+          });
+        }
+        container.appendChild(shell);
       });
+    }
+
+    function inspectCard(card) {
+      const overlay = document.createElement("div");
+      const image = document.createElement("img");
+      overlay.className = "inspect-overlay";
+      image.src = card.image;
+      image.alt = `放大查看${card.label}`;
+      image.draggable = false;
+      overlay.appendChild(image);
+      document.body.appendChild(overlay);
+      overlay.addEventListener("click", () => overlay.remove(), { once: true });
     }
 
     function showcaseCard(card) {
