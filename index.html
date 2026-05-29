@@ -11,7 +11,7 @@
       --felt: #0f5d3f;
       --felt-dark: #083727;
       --gold: #ffd56a;
-      --gold-dark: #c8962e;
+      --gold-deep: #b87921;
       --white: #fff8e8;
       --muted: #b8d4c6;
       --danger: #ff6b6b;
@@ -34,6 +34,18 @@
       overflow-x: hidden;
     }
 
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        repeating-linear-gradient(118deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 46px),
+        radial-gradient(circle at 50% 18%, rgba(255,213,106,0.08), transparent 28rem);
+      mask-image: radial-gradient(circle at center, black, transparent 88%);
+      pointer-events: none;
+    }
+
     .app {
       width: min(100%, 560px);
       min-height: 100svh;
@@ -48,24 +60,97 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      gap: 12px;
+      gap: 10px;
     }
+
+    .logo {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      padding: 6px 11px 7px 7px;
+      border-radius: 18px;
+      background:
+        linear-gradient(135deg, rgba(255, 213, 106, 0.20), rgba(255,255,255,0.05) 45%, rgba(84, 227, 143, 0.10)),
+        rgba(0,0,0,0.18);
+      border: 1px solid rgba(255, 213, 106, 0.28);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.24), inset 0 0 18px rgba(255,255,255,0.05);
+    }
+
+    .logo::after {
+      content: "";
+      position: absolute;
+      left: 62px;
+      right: 12px;
+      bottom: 5px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, rgba(255,213,106,0.9), rgba(255,255,255,0.1));
+    }
+
+    .logo-emblem {
+      width: clamp(36px, 9.4vw, 48px);
+      height: clamp(36px, 9.4vw, 48px);
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      overflow: hidden;
+      color: #2d1900;
+      font-size: clamp(21px, 6vw, 30px);
+      font-weight: 1000;
+      background: linear-gradient(145deg, #fff6c8, var(--gold) 48%, #55cf84);
+      border: 1px solid rgba(255,255,255,0.34);
+      box-shadow: 0 0 0 2px rgba(255,213,106,0.18), 0 10px 22px rgba(0,0,0,0.28);
+    }
+
+    .logo-icon {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .logo-icon[hidden],
+    .logo-fallback[hidden] { display: none; }
+
+    .logo-fallback { line-height: 1; filter: drop-shadow(0 2px 0 rgba(255,255,255,0.35)); }
 
     h1 {
       margin: 0;
-      font-size: clamp(28px, 8vw, 42px);
-      letter-spacing: 0.03em;
-      line-height: 1;
-      text-shadow: 0 3px 0 rgba(0,0,0,0.35);
+      font-size: clamp(25px, 7.2vw, 39px);
+      letter-spacing: 0.06em;
+      line-height: 0.95;
+      color: var(--gold);
+      font-family: "STKaiti", "KaiTi", "Microsoft YaHei", system-ui, sans-serif;
+      font-weight: 1000;
+      white-space: nowrap;
+      text-shadow:
+        0 1px 0 #fff5bd,
+        0 3px 0 rgba(98, 54, 5, 0.8),
+        0 7px 14px rgba(0,0,0,0.38),
+        0 0 18px rgba(255, 213, 106, 0.28);
+    }
+
+    h1 .title-accent {
+      color: #fff7d0;
+      font-size: 0.74em;
+      margin-left: 0.03em;
+      text-shadow: 0 2px 0 rgba(98, 54, 5, 0.82), 0 0 12px rgba(255,213,106,0.34);
     }
 
     .developer {
       color: var(--gold);
-      font-size: clamp(13px, 3.2vw, 16px);
+      font-size: clamp(12px, 3vw, 15px);
       font-weight: 900;
       letter-spacing: 0.04em;
       text-shadow: 0 2px 0 rgba(0,0,0,0.32);
       white-space: nowrap;
+      padding: 7px 10px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 213, 106, 0.28);
+      background: rgba(0,0,0,0.18);
     }
 
     .score-pill {
@@ -83,7 +168,7 @@
       color: var(--danger);
       font-size: 17px;
       letter-spacing: 0.08em;
-      text-shadow: 0 2px 0 rgba(0,0,0,0.32);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.32), 0 0 8px rgba(255,107,107,0.44);
     }
 
     .table {
@@ -110,6 +195,20 @@
       pointer-events: none;
     }
 
+    .table::after {
+      content: "DIMENSION BLACKJACK";
+      position: absolute;
+      left: 50%;
+      top: 49%;
+      transform: translate(-50%, -50%) rotate(-8deg);
+      color: rgba(255,255,255,0.045);
+      font-size: 32px;
+      font-weight: 1000;
+      letter-spacing: 0.16em;
+      white-space: nowrap;
+      pointer-events: none;
+    }
+
     .zone {
       position: relative;
       z-index: 1;
@@ -133,17 +232,19 @@
       align-items: center;
       gap: 8px;
       font-size: 16px;
-      font-weight: 800;
+      font-weight: 900;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
     }
 
     .avatar {
-      width: 30px;
-      height: 30px;
+      width: 32px;
+      height: 32px;
       display: inline-grid;
       place-items: center;
       border-radius: 50%;
       background: rgba(0,0,0,0.24);
       border: 1px solid rgba(255,255,255,0.18);
+      box-shadow: inset 0 0 12px rgba(255,213,106,0.06);
     }
 
     .cards {
@@ -158,11 +259,11 @@
 
     .card-shell {
       position: relative;
-      width: clamp(76px, 23vw, 116px);
+      width: clamp(78px, 23vw, 116px);
       aspect-ratio: 0.69;
       border-radius: 10px;
-      background: #f8f0dc;
-      box-shadow: 0 8px 18px rgba(0,0,0,0.42);
+      background: transparent;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06);
       transform-origin: bottom center;
       animation: deal 240ms ease-out both;
       overflow: hidden;
@@ -172,25 +273,56 @@
     .card-shell:nth-child(2n) { transform: translateY(4px) rotate(1.5deg); }
     .card-shell:nth-child(3n) { transform: translateY(-3px) rotate(-1.5deg); }
 
-    .card-shell.player-card.hidden-card::before {
+    .card-shell.player-card.player-hole-card::before {
+      content: "己方盖牌";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: start center;
+      padding-top: 9px;
+      color: rgba(255,255,255,0.96);
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 0.12em;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.72), 0 0 8px rgba(255,213,106,0.54);
+      background:
+        linear-gradient(180deg, rgba(84, 88, 86, 0.74) 0%, rgba(106, 112, 108, 0.48) 31%, rgba(160, 164, 160, 0.20) 64%, rgba(255,255,255,0.03) 100%),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.12) 0 1px, transparent 1px 8px);
+      border: 2px solid rgba(220,226,220,0.58);
+      box-shadow: inset 0 0 28px rgba(0,0,0,0.28), inset 0 0 0 1px rgba(255,255,255,0.2);
+      pointer-events: none;
+    }
+
+    .card-shell.player-card.player-hole-card::after {
       content: "";
       position: absolute;
-      inset: 0 0 auto;
-      height: 34%;
-      z-index: 1;
-      background: rgba(120, 128, 126, 0.22);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+      z-index: 3;
+      left: 14%;
+      right: 14%;
+      top: 34px;
+      height: 2px;
+      border-radius: 999px;
+      background: rgba(255,255,255,0.74);
+      box-shadow: 0 0 8px rgba(255,213,106,0.8);
       pointer-events: none;
     }
 
     .card-shell.hidden-card { cursor: default; }
+    .card-shell.back-card { background: #123c2d; }
 
     .card {
       width: 100%;
       height: 100%;
       display: block;
       object-fit: contain;
-      background: #f8f0dc;
+      background: transparent;
+    }
+
+    .card-back {
+      object-fit: cover;
+      background: #123c2d;
+      transform: scale(1.015);
     }
 
     @keyframes deal {
@@ -252,13 +384,13 @@
       font-weight: 900;
       cursor: pointer;
       background: linear-gradient(180deg, #ffe89e, var(--gold));
-      box-shadow: 0 5px 0 var(--gold-dark), 0 10px 18px rgba(0,0,0,0.25);
+      box-shadow: 0 5px 0 var(--gold-deep), 0 10px 18px rgba(0,0,0,0.25);
       transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
     }
 
     button:active:not(:disabled) {
       transform: translateY(4px);
-      box-shadow: 0 1px 0 var(--gold-dark), 0 5px 12px rgba(0,0,0,0.22);
+      box-shadow: 0 1px 0 var(--gold-deep), 0 5px 12px rgba(0,0,0,0.22);
     }
 
     button:disabled {
@@ -306,14 +438,12 @@
       max-height: 76svh;
       aspect-ratio: 0.69;
       object-fit: contain;
-      background: #f8f0dc;
+      background: transparent;
       border-radius: 18px;
       box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6), 0 0 0 4px rgba(255, 213, 106, 0.42);
     }
 
-    .draw-showcase img {
-      animation: showcase-card 1300ms cubic-bezier(0.19, 1, 0.22, 1) both;
-    }
+    .draw-showcase img { animation: showcase-card 1300ms cubic-bezier(0.19, 1, 0.22, 1) both; }
 
     .inspect-overlay {
       position: fixed;
@@ -327,9 +457,7 @@
       cursor: zoom-out;
     }
 
-    .inspect-overlay img {
-      animation: inspect-card 220ms ease-out both;
-    }
+    .inspect-overlay img { animation: inspect-card 220ms ease-out both; }
 
     @keyframes inspect-card {
       from { opacity: 0; transform: scale(0.58) rotateZ(-3deg); }
@@ -343,11 +471,17 @@
       100% { opacity: 0; transform: scale(0.28) translateY(42vh) rotateY(720deg); }
     }
 
+    @media (max-width: 430px) {
+      header { align-items: flex-start; }
+      .developer { padding-inline: 8px; }
+      .logo { padding-inline: 7px; }
+    }
+
     @media (max-height: 780px) {
       .table { min-height: 600px; }
       .zone { min-height: 182px; }
       .cards { min-height: 132px; }
-      .card-shell { width: clamp(68px, 20vw, 94px); }
+      .card-shell { width: clamp(70px, 20vw, 96px); }
       .center-panel { min-height: 84px; padding: 10px; }
     }
 
@@ -359,8 +493,12 @@
 <body>
   <main class="app" aria-label="Blackjack 21点小游戏">
     <header>
-      <div>
-        <h1>次元赌局21点</h1>
+      <div class="logo" aria-label="次元赌局21点">
+        <span class="logo-emblem">
+          <img class="logo-icon" id="app-icon" alt="游戏图标" hidden>
+          <span class="logo-fallback" id="logo-fallback">♠</span>
+        </span>
+        <h1>次元赌局<span class="title-accent">21点</span></h1>
       </div>
       <div class="developer">开发者：兔兔酱</div>
     </header>
@@ -368,7 +506,7 @@
     <section class="table">
       <section class="zone" aria-labelledby="dealer-title">
         <div class="zone-header">
-          <div class="zone-title" id="dealer-title"><span class="avatar">🤖</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
+          <div class="zone-title" id="dealer-title"><span class="avatar">♛</span> 次元庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="dealer-score">?</span></div>
         </div>
         <div class="cards" id="dealer-cards" aria-label="庄家手牌"></div>
@@ -377,13 +515,13 @@
       <section class="center-panel" aria-live="polite">
         <div>
           <p class="message" id="message">点击“发牌”开始第一局</p>
-          <p class="hint" id="hint">双方起始3颗❤，每输一局扣1颗，归0输掉比赛。</p>
+          <p class="hint" id="hint">牌组只有A-10共40张，A可算1或11。</p>
         </div>
       </section>
 
       <section class="zone" aria-labelledby="player-title">
         <div class="zone-header">
-          <div class="zone-title" id="player-title"><span class="avatar">🧑</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span></div>
+          <div class="zone-title" id="player-title"><span class="avatar">✦</span> 挑战者 <span class="life-hearts" id="player-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="player-score">0</span></div>
         </div>
         <div class="cards" id="player-cards" aria-label="玩家手牌"></div>
@@ -397,7 +535,7 @@
     </nav>
 
     <section class="rules">
-      <strong>当前规则：</strong>①双方起始3颗❤，每输一局扣1颗，归0输掉比赛。②牌组只使用A-10四种花色共40张，J/Q/K和大小王不参与。③A可算1或11。④双方都选择停牌时比较大小。
+      <strong>当前规则：</strong>①牌组只使用A-10四种花色共40张，没有J/Q/K/大小王。②A可算1或11。③双方都选择停牌时比较大小。
     </section>
   </main>
 
@@ -413,6 +551,7 @@
       dealer: [],
       roundActive: false,
       dealerHidden: true,
+      playerHoleIndex: 1,
       playerLives: maxLives,
       dealerLives: maxLives,
       gameOver: false,
@@ -438,6 +577,7 @@
     elements.standButton.addEventListener("click", playerStand);
 
     preloadDeckImages();
+    loadAppIcon();
     render();
 
     function createDeck() {
@@ -454,6 +594,33 @@
         const image = new Image();
         image.src = src;
       });
+    }
+
+    function loadAppIcon() {
+      const icon = document.querySelector("#app-icon");
+      const fallback = document.querySelector("#logo-fallback");
+      const candidates = [
+        "img/icon.png",
+        "img/icon.jpg",
+        "img/icon.jpeg",
+        "img/图标.png",
+        "img/图标.jpg",
+        "icon.png",
+        "icon.jpg",
+        backImage,
+      ];
+      let index = 0;
+      const tryNext = () => {
+        if (index >= candidates.length) return;
+        icon.src = candidates[index];
+        index += 1;
+      };
+      icon.addEventListener("load", () => {
+        icon.hidden = false;
+        fallback.hidden = true;
+      });
+      icon.addEventListener("error", tryNext);
+      tryNext();
     }
 
     function shuffle(deck) {
@@ -483,7 +650,7 @@
       state.dealer = [draw(), draw()];
       state.roundActive = true;
       state.dealerHidden = true;
-      setMessage("你的回合：要牌还是停牌？", "双方都选择停牌时比较大小。你可以根据A-10共40张牌估算剩余牌和庄家暗牌。", true);
+      setMessage("你的回合：要牌还是停牌？", "你的第二张牌会以灰色遮罩标记为己方盖牌，双方都停牌后比较大小。", true);
 
       const playerBlackjack = isBlackjack(state.player);
       const dealerBlackjack = isBlackjack(state.dealer);
@@ -613,7 +780,7 @@
       state.player = [];
       state.dealer = [];
       state.deck = [];
-      setMessage("新的一场开始", "双方起始3颗❤，每输一局扣1颗，归0输掉比赛。", true);
+      setMessage("新的一场开始", "牌组只有A-10共40张，A可算1或11。", true);
     }
 
     function setMessage(message, hint, resetClass = true) {
@@ -623,7 +790,7 @@
     }
 
     function render() {
-      renderHand(elements.playerCards, state.player, false, "player");
+      renderHand(elements.playerCards, state.player, false, "player", state.playerHoleIndex);
       renderHand(elements.dealerCards, state.dealer, state.dealerHidden, "dealer");
 
       elements.playerScore.textContent = state.player.length ? handValue(state.player).total : 0;
@@ -640,16 +807,17 @@
       elements.dealerLives.textContent = hearts(state.dealerLives);
     }
 
-    function renderHand(container, hand, hideSecondCard = false, owner = "player") {
+    function renderHand(container, hand, hideSecondCard = false, owner = "player", playerHoleIndex = -1) {
       container.innerHTML = "";
       hand.forEach((card, index) => {
         const hidden = hideSecondCard && index === 1;
+        const playerHole = owner === "player" && index === playerHoleIndex;
         const shell = document.createElement("div");
         const img = document.createElement("img");
-        shell.className = `card-shell ${owner}-card${hidden ? " hidden-card" : ""}`;
-        img.className = "card";
+        shell.className = `card-shell ${owner}-card${hidden ? " hidden-card back-card" : ""}${playerHole ? " player-hole-card" : ""}`;
+        img.className = `card${hidden ? " card-back" : ""}`;
         img.src = hidden ? backImage : card.image;
-        img.alt = hidden ? "庄家暗牌" : card.label;
+        img.alt = hidden ? "庄家暗牌" : playerHole ? `${card.label}，己方盖牌` : card.label;
         img.draggable = false;
         shell.appendChild(img);
         if (!hidden) {
