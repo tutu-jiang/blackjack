@@ -252,22 +252,26 @@
       text-shadow: 0 2px 0 rgba(0,0,0,0.35);
     }
 
-    .turn-badge {
-      display: none;
-      margin-left: 4px;
-      padding: 6px 9px;
-      border: 4px solid #020b08;
-      background: rgba(7, 50, 36, 0.96);
-      color: #fff8e8;
-      font-size: 16px;
-      font-weight: 1000;
-      letter-spacing: 0.03em;
-      line-height: 1;
-      box-shadow: 0 0 0 1px rgba(255, 213, 106, 0.18), 0 8px 16px rgba(0,0,0,0.28);
-      text-shadow: none;
+    .zone.turn-active {
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 50% 42%, rgba(255, 213, 106, 0.14), transparent 58%),
+        linear-gradient(180deg, rgba(255, 213, 106, 0.055), rgba(84, 227, 143, 0.035));
+      box-shadow:
+        inset 0 0 28px rgba(255, 213, 106, 0.16),
+        0 0 18px rgba(255, 213, 106, 0.18);
     }
 
-    .turn-badge.active { display: inline-flex; }
+    .zone.turn-active .zone-title {
+      color: #fff4c0;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.45), 0 0 12px rgba(255,213,106,0.52);
+    }
+
+    .zone.player-active {
+      box-shadow:
+        inset 0 0 30px rgba(84, 227, 143, 0.18),
+        0 0 20px rgba(84, 227, 143, 0.18);
+    }
 
     .avatar {
       width: 34px;
@@ -593,6 +597,7 @@
     }
 
     .rules strong { color: var(--white); }
+    .rule-hot { color: #ff6b6b; font-weight: 1000; }
     .win { color: var(--success); }
     .lose { color: var(--danger); }
 
@@ -925,9 +930,9 @@
     </header>
 
     <section class="table">
-      <section class="zone" aria-labelledby="dealer-title">
+      <section class="zone" id="dealer-zone" aria-labelledby="dealer-title">
         <div class="zone-header">
-          <div class="zone-title" id="dealer-title"><span class="avatar dealer-avatar">☠</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span><span class="turn-badge" id="dealer-turn">庄家回合</span></div>
+          <div class="zone-title" id="dealer-title"><span class="avatar dealer-avatar">☠</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="dealer-score">?</span></div>
         </div>
         <div class="cards" id="dealer-cards" aria-label="庄家手牌"></div>
@@ -941,9 +946,9 @@
         </div>
       </section>
 
-      <section class="zone" aria-labelledby="player-title">
+      <section class="zone" id="player-zone" aria-labelledby="player-title">
         <div class="zone-header">
-          <div class="zone-title" id="player-title"><span class="avatar player-avatar">⚔</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span><span class="turn-badge" id="player-turn">我的回合</span></div>
+          <div class="zone-title" id="player-title"><span class="avatar player-avatar">⚔</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span></div>
           <div class="score-pill">点数：<span id="player-score">0</span></div>
         </div>
         <div class="cards" id="player-cards" aria-label="玩家手牌"></div>
@@ -957,11 +962,11 @@
     <nav class="controls" aria-label="游戏操作">
       <button id="deal-button">发牌</button>
       <button id="hit-button" class="secondary" disabled>要牌</button>
-      <button id="stand-button" class="secondary" disabled>结束回合</button>
+      <button id="stand-button" class="secondary" disabled>结束</button>
     </nav>
 
     <section class="rules">
-      <strong>当前规则：</strong>①数字牌只使用A-10四种花色共40张，没有J/Q/K/大小王。②技能牌共12张不重复，开局双方固定获取2张，每个自己的回合有50%概率获得1张技能牌。③每个自己的回合只能主动抽1张数字牌，技能牌不限使用数量。④双方都不抽牌且结束回合时比较大小。
+      <strong>游戏规则：</strong>①数字牌只有A-10四种花色共40张，没有J/Q/K/大小王，<span class="rule-hot">A=1或11</span>。②技能牌共12张不重复，开局双方固定获得2张，每当自己回合有<span class="rule-hot">50%概率</span>获得1张技能牌。③自己回合只能主动抽1张数字牌，技能牌使用不限数量。④双方都不抽牌且结束回合时比较大小。
     </section>
   </main>
 
@@ -1023,8 +1028,8 @@
       standButton: document.querySelector("#stand-button"),
       playerLives: document.querySelector("#player-lives"),
       dealerLives: document.querySelector("#dealer-lives"),
-      playerTurn: document.querySelector("#player-turn"),
-      dealerTurn: document.querySelector("#dealer-turn"),
+      playerZone: document.querySelector("#player-zone"),
+      dealerZone: document.querySelector("#dealer-zone"),
     };
 
     elements.dealButton.addEventListener("click", startRound);
@@ -1199,7 +1204,7 @@
       state.turn = "player";
       resetTurnFlags();
       await maybeGrantTurnSkill("player");
-      setMessage("我的决策", canUseSkills("player") ? "你在自己回合内可以抽1张数字牌，也可以随时发动任意数量技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
+      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽1张数字牌，也可以随时发动技能牌；点击“结束”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
 
       render();
     }
@@ -1216,7 +1221,7 @@
       state.playerEndedCleanly = false;
       state.animating = false;
 
-      setMessage("我的决策", "本回合已抽1张数字牌，要牌按钮已锁定；即使21点或爆牌，也可继续使用技能牌，或点击“结束回合”。", true);
+      setMessage("我的决策", "本回合已抽1张数字牌，要牌按钮已锁定；即使21点或爆牌，也可继续使用技能牌，或点击“结束”。", true);
       render();
     }
 
@@ -1261,7 +1266,7 @@
       resetTurnFlags();
       await maybeGrantTurnSkill("player");
       state.animating = false;
-      setMessage("我的决策", canUseSkills("player") ? "你在自己回合内可以抽1张数字牌，也可以随时发动任意数量技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
+      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽1张数字牌，也可以随时发动技能牌；点击“结束”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
       render();
     }
 
@@ -1304,7 +1309,7 @@
       const [skill] = state.playerSkills.splice(index, 1);
       await activateSkill("player", skill);
       state.animating = false;
-      setMessage("我的决策", "你可以继续使用技能牌，或抽1张数字牌，或点击“结束回合”。", true);
+      setMessage("我的决策", "你可以继续使用技能牌，或抽1张数字牌，或点击“结束”。", true);
       render();
     }
 
@@ -1779,15 +1784,17 @@
         : "?";
 
       elements.dealButton.textContent = state.gameOver ? "重新开始" : state.player.length ? "下一局" : "发牌";
-      elements.standButton.textContent = "结束回合";
+      elements.standButton.textContent = "结束";
       elements.dealButton.disabled = state.roundActive || state.animating;
       elements.hitButton.disabled = !state.roundActive || state.animating || state.turn !== "player" || state.playerDrewThisTurn;
       elements.standButton.disabled = !state.roundActive || state.animating || state.turn !== "player";
 
       elements.playerLives.textContent = hearts(state.playerLives);
       elements.dealerLives.textContent = hearts(state.dealerLives);
-      elements.playerTurn.classList.toggle("active", state.turn === "player");
-      elements.dealerTurn.classList.toggle("active", state.turn === "dealer");
+      elements.playerZone.classList.toggle("turn-active", state.turn === "player");
+      elements.playerZone.classList.toggle("player-active", state.turn === "player");
+      elements.dealerZone.classList.toggle("turn-active", state.turn === "dealer");
+      elements.dealerZone.classList.toggle("dealer-active", state.turn === "dealer");
       updateOverflowIndicators();
     }
 
