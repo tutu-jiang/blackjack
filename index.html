@@ -50,10 +50,10 @@
       width: min(100%, 560px);
       min-height: 100svh;
       margin: 0 auto;
-      padding: max(16px, env(safe-area-inset-top)) 14px max(18px, env(safe-area-inset-bottom));
+      padding: max(10px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom));
       display: flex;
       flex-direction: column;
-      gap: 12px;
+      gap: 8px;
     }
 
     header {
@@ -69,8 +69,8 @@
       align-items: center;
       gap: 9px;
       min-width: 0;
-      padding: 7px 13px 8px 7px;
-      border-radius: 16px;
+      padding: 5px 10px 6px 5px;
+      border-radius: 12px;
       background:
         linear-gradient(90deg, rgba(18, 8, 5, 0.96), rgba(56, 18, 14, 0.78) 48%, rgba(10, 38, 27, 0.72)),
         rgba(0,0,0,0.28);
@@ -81,7 +81,7 @@
     .logo::before {
       content: "";
       position: absolute;
-      inset: 4px 6px 4px 58px;
+      inset: 4px 6px 4px 50px;
       border-top: 1px solid rgba(255, 213, 106, 0.24);
       border-bottom: 1px solid rgba(255, 213, 106, 0.14);
       border-radius: 12px;
@@ -91,18 +91,18 @@
     .logo::after {
       content: "DEADLY BLACKJACK";
       position: absolute;
-      left: 64px;
-      bottom: 3px;
+      left: 56px;
+      bottom: 2px;
       color: rgba(255, 107, 107, 0.48);
-      font-size: 8px;
+      font-size: 7px;
       font-weight: 1000;
       letter-spacing: 0.18em;
       pointer-events: none;
     }
 
     .logo-emblem {
-      width: clamp(36px, 9.4vw, 48px);
-      height: clamp(36px, 9.4vw, 48px);
+      width: clamp(32px, 8.4vw, 42px);
+      height: clamp(32px, 8.4vw, 42px);
       flex: 0 0 auto;
       display: grid;
       place-items: center;
@@ -132,7 +132,7 @@
       position: relative;
       z-index: 1;
       margin: 0;
-      font-size: clamp(28px, 7.6vw, 42px);
+      font-size: clamp(24px, 6.6vw, 36px);
       letter-spacing: 0.08em;
       line-height: 0.95;
       color: #fff3c0;
@@ -158,12 +158,12 @@
 
     .developer {
       color: var(--gold);
-      font-size: clamp(12px, 3vw, 15px);
+      font-size: clamp(11px, 2.8vw, 14px);
       font-weight: 900;
       letter-spacing: 0.04em;
       text-shadow: 0 2px 0 rgba(0,0,0,0.32);
       white-space: nowrap;
-      padding: 7px 10px;
+      padding: 5px 9px;
       border-radius: 999px;
       border: 1px solid rgba(255, 213, 106, 0.28);
       background: rgba(0,0,0,0.18);
@@ -321,7 +321,7 @@
       z-index: 3;
       width: 22px;
       height: 44px;
-      display: grid;
+      display: none;
       place-items: center;
       border-radius: 999px;
       color: rgba(255, 213, 106, 0.9);
@@ -331,6 +331,8 @@
       pointer-events: none;
       text-shadow: 0 2px 6px rgba(0,0,0,0.65);
     }
+
+    .zone.has-overflow::after { display: grid; }
 
     .skill-count {
       min-height: 30px;
@@ -402,6 +404,7 @@
     .card-shell {
       position: relative;
       width: clamp(78px, 23vw, 116px);
+      flex: 0 0 clamp(78px, 23vw, 116px);
       aspect-ratio: 0.69;
       border-radius: 10px;
       background: transparent;
@@ -641,6 +644,7 @@
       position: fixed;
       z-index: 29;
       width: clamp(78px, 23vw, 116px);
+      flex: 0 0 clamp(78px, 23vw, 116px);
       aspect-ratio: 0.69;
       right: -140px;
       top: 48%;
@@ -658,6 +662,41 @@
       display: block;
       object-fit: contain;
       border-radius: 10px;
+    }
+
+    .swap-flight {
+      position: fixed;
+      z-index: 34;
+      left: 50%;
+      width: clamp(78px, 23vw, 116px);
+      aspect-ratio: 0.69;
+      pointer-events: none;
+      filter: drop-shadow(0 18px 22px rgba(0,0,0,0.5));
+    }
+
+    .swap-flight img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .swap-to-dealer { top: 66%; animation: swap-to-dealer 1150ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+    .swap-to-player { top: 24%; animation: swap-to-player 1150ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+    @keyframes swap-to-dealer {
+      0% { opacity: 0; transform: translate(-50%, 0) scale(0.82) rotate(-8deg); }
+      12% { opacity: 1; }
+      50% { opacity: 1; transform: translate(-50%, -22vh) scale(1.15) rotate(8deg); }
+      100% { opacity: 0; transform: translate(-50%, -42vh) scale(0.9) rotate(0deg); }
+    }
+
+    @keyframes swap-to-player {
+      0% { opacity: 0; transform: translate(-50%, 0) scale(0.82) rotate(8deg); }
+      12% { opacity: 1; }
+      50% { opacity: 1; transform: translate(-50%, 22vh) scale(1.15) rotate(-8deg); }
+      100% { opacity: 0; transform: translate(-50%, 42vh) scale(0.9) rotate(0deg); }
     }
 
     .skill-showcase {
@@ -850,16 +889,20 @@
     }
 
     @media (max-width: 430px) {
-      header { align-items: flex-start; }
-      .developer { padding-inline: 8px; }
-      .logo { padding-inline: 7px; }
+      .app { padding-top: max(6px, env(safe-area-inset-top)); gap: 7px; }
+      header { align-items: center; gap: 6px; }
+      .developer { padding: 4px 7px; font-size: 11px; }
+      .logo { padding: 4px 8px 5px 4px; gap: 7px; }
+      .logo::before { left: 46px; }
+      .logo::after { left: 52px; font-size: 6px; }
+      .logo-emblem { width: 34px; height: 34px; }
+      h1 { font-size: clamp(24px, 6.4vw, 30px); letter-spacing: 0.04em; }
     }
 
     @media (max-height: 780px) {
       .table { min-height: 600px; }
       .zone { min-height: 182px; }
       .cards { min-height: 132px; }
-      .card-shell { width: clamp(70px, 20vw, 96px); }
       .center-panel { min-height: 84px; padding: 10px; }
     }
 
@@ -918,7 +961,7 @@
     </nav>
 
     <section class="rules">
-      <strong>当前规则：</strong>①数字牌只使用A-10四种花色共40张，没有J/Q/K/大小王。②技能牌共12张且一局不重复，开局双方各2张，每回合开始50%概率获得1张。③每回合只能主动抽1张数字牌，技能牌不限使用数量。④双方都结束回合且不再抽牌时比较大小，21点或爆牌都不会提前结算。
+      <strong>当前规则：</strong>①数字牌只使用A-10四种花色共40张，没有J/Q/K/大小王。②技能牌共12张不重复，开局双方固定获取2张，每个自己的回合有50%概率获得1张技能牌。③每个自己的回合只能主动抽1张数字牌，技能牌不限使用数量。④双方都不抽牌且结束回合时比较大小。
     </section>
   </main>
 
@@ -1156,7 +1199,7 @@
       state.turn = "player";
       resetTurnFlags();
       await maybeGrantTurnSkill("player");
-      setMessage("我的决策", canUseSkills("player") ? "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
+      setMessage("我的决策", canUseSkills("player") ? "你在自己回合内可以抽1张数字牌，也可以随时发动任意数量技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
 
       render();
     }
@@ -1218,7 +1261,7 @@
       resetTurnFlags();
       await maybeGrantTurnSkill("player");
       state.animating = false;
-      setMessage("我的决策", canUseSkills("player") ? "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
+      setMessage("我的决策", canUseSkills("player") ? "你在自己回合内可以抽1张数字牌，也可以随时发动任意数量技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
       render();
     }
 
@@ -1361,11 +1404,12 @@
         card.append(img, name, caption);
         overlay.appendChild(card);
         document.body.appendChild(overlay);
-        setTimeout(() => card.classList.add("ash-out"), 2000);
+        const holdMs = owner === "dealer" ? 5000 : 2000;
+        setTimeout(() => card.classList.add("ash-out"), holdMs);
         setTimeout(() => {
           overlay.remove();
           resolve();
-        }, 2900);
+        }, holdMs + 900);
       });
     }
 
@@ -1518,9 +1562,38 @@
       }
       const p = playerOptions[secureRandomInt(playerOptions.length)];
       const d = dealerOptions[secureRandomInt(dealerOptions.length)];
-      [state.player[p.index], state.dealer[d.index]] = [d.card, p.card];
       setMessage("换牌", `双方交换了${p.card.label}与${d.card.label}。`, true);
-      await wait(1200);
+      await animateSwapCards(p.card, d.card);
+      [state.player[p.index], state.dealer[d.index]] = [d.card, p.card];
+      render();
+      await wait(450);
+    }
+
+    function animateSwapCards(playerCard, dealerCard) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const playerFlyer = document.createElement("div");
+        const dealerFlyer = document.createElement("div");
+        const playerImg = document.createElement("img");
+        const dealerImg = document.createElement("img");
+        overlay.className = "swap-overlay";
+        playerFlyer.className = "swap-flight swap-to-dealer";
+        dealerFlyer.className = "swap-flight swap-to-player";
+        playerImg.alt = `玩家交换${playerCard.label}`;
+        dealerImg.alt = `庄家交换${dealerCard.label}`;
+        playerImg.draggable = false;
+        dealerImg.draggable = false;
+        setResilientImage(playerImg, playerCard.imageCandidates, playerImg.alt);
+        setResilientImage(dealerImg, dealerCard.imageCandidates, dealerImg.alt);
+        playerFlyer.appendChild(playerImg);
+        dealerFlyer.appendChild(dealerImg);
+        overlay.append(playerFlyer, dealerFlyer);
+        document.body.appendChild(overlay);
+        setTimeout(() => {
+          overlay.remove();
+          resolve();
+        }, 1200);
+      });
     }
 
     async function setForcedRank(owner, rank, skillName) {
@@ -1715,6 +1788,18 @@
       elements.dealerLives.textContent = hearts(state.dealerLives);
       elements.playerTurn.classList.toggle("active", state.turn === "player");
       elements.dealerTurn.classList.toggle("active", state.turn === "dealer");
+      updateOverflowIndicators();
+    }
+
+    function updateOverflowIndicators() {
+      const update = container => {
+        const zone = container.closest(".zone");
+        if (!zone) return;
+        const visibleCardCount = container.querySelectorAll(".card-shell").length;
+        zone.classList.toggle("has-overflow", visibleCardCount > 4);
+      };
+      update(elements.dealerCards);
+      update(elements.playerCards);
     }
 
     function renderHand(container, hand, hideSecondCard = false, owner = "player", playerHoleIndex = -1) {
