@@ -298,10 +298,105 @@
       min-height: 162px;
       display: flex;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       gap: clamp(6px, 2vw, 12px);
-      padding: 8px 2px;
-      flex-wrap: wrap;
+      padding: 8px 26px 8px 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,213,106,0.55) rgba(0,0,0,0.12);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .cards::-webkit-scrollbar { height: 5px; }
+    .cards::-webkit-scrollbar-thumb { background: rgba(255,213,106,0.55); border-radius: 999px; }
+
+    .zone::after {
+      content: "›";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      z-index: 3;
+      width: 22px;
+      height: 44px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      color: rgba(255, 213, 106, 0.9);
+      background: linear-gradient(90deg, transparent, rgba(0,0,0,0.34));
+      font-size: 30px;
+      font-weight: 1000;
+      pointer-events: none;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.65);
+    }
+
+    .skill-count {
+      min-height: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 4px 4px;
+      color: rgba(255,248,232,0.86);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    }
+
+    .hand-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 14px;
+      padding: 4px 0 0;
+    }
+
+    .hand-tab {
+      min-width: 104px;
+      min-height: 44px;
+      border: 2px solid rgba(255, 213, 106, 0.18);
+      border-radius: 0;
+      color: #fff8e8;
+      background: rgba(2, 17, 12, 0.86);
+      box-shadow: 0 5px 0 #020807, 0 8px 14px rgba(0,0,0,0.28);
+      font-size: 16px;
+      font-weight: 1000;
+      cursor: pointer;
+    }
+
+    .hand-tab.active {
+      border-color: rgba(255, 213, 106, 0.72);
+      background: linear-gradient(180deg, rgba(27, 76, 56, 0.96), rgba(7, 35, 25, 0.96));
+      color: var(--gold);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.42);
+    }
+
+    .card-shell.skill-card-shell {
+      background: linear-gradient(160deg, rgba(45, 18, 10, 0.92), rgba(5, 35, 26, 0.92));
+    }
+
+    .card-shell.skill-card-shell::after {
+      content: "技能";
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      z-index: 2;
+      padding: 2px 6px;
+      border-radius: 999px;
+      color: #2b1700;
+      background: rgba(255, 213, 106, 0.92);
+      font-size: 11px;
+      font-weight: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      pointer-events: none;
+    }
+
+    .empty-skill-hint {
+      color: rgba(255,248,232,0.72);
+      font-size: 14px;
+      font-weight: 800;
+      padding: 18px 8px;
     }
 
     .card-shell {
@@ -312,7 +407,6 @@
       background: transparent;
       box-shadow: 0 8px 18px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06);
       transform-origin: bottom center;
-      animation: deal 240ms ease-out both;
       overflow: hidden;
       cursor: zoom-in;
     }
@@ -349,6 +443,24 @@
       border-radius: inherit;
       border: 1px solid rgba(255,255,255,0.62);
       box-shadow: inset 0 0 16px rgba(255,255,255,0.13), 0 0 10px rgba(0,0,0,0.22);
+      pointer-events: none;
+    }
+
+    .card-shell.revealed-hole-card::before {
+      content: "已透视";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: start center;
+      padding-top: 9px;
+      color: rgba(255,255,255,0.96);
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 0.12em;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255, 213, 106, 0.28), rgba(255,255,255,0.04) 58%);
+      box-shadow: inset 0 0 0 2px rgba(255,213,106,0.45);
       pointer-events: none;
     }
 
@@ -548,6 +660,65 @@
       border-radius: 10px;
     }
 
+    .skill-showcase {
+      position: fixed;
+      inset: 0;
+      z-index: 32;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(5px);
+      pointer-events: none;
+    }
+
+    .skill-showcase-card {
+      width: min(76vw, 390px);
+      min-height: 260px;
+      display: grid;
+      place-items: center;
+      gap: 10px;
+      padding: 20px;
+      border-radius: 24px;
+      border: 1px solid rgba(255, 213, 106, 0.42);
+      background: linear-gradient(155deg, rgba(38, 14, 8, 0.96), rgba(7, 38, 28, 0.96));
+      box-shadow: 0 30px 80px rgba(0,0,0,0.65), inset 0 0 30px rgba(255,213,106,0.08);
+      animation: skill-enter 220ms ease-out both;
+    }
+
+    .skill-showcase-card.ash-out { animation: ash-out 900ms ease-in both; }
+
+    .skill-showcase-card img {
+      width: min(58vw, 260px);
+      aspect-ratio: 0.69;
+      object-fit: contain;
+      border-radius: 16px;
+    }
+
+    .skill-showcase-name {
+      color: var(--gold);
+      font-size: 28px;
+      font-weight: 1000;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.55);
+    }
+
+    .skill-showcase-caption {
+      color: #fff8e8;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    @keyframes skill-enter {
+      from { opacity: 0; transform: translateY(22px) scale(0.82); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes ash-out {
+      0% { opacity: 1; filter: grayscale(0); transform: translateY(0) scale(1); }
+      65% { opacity: 0.55; filter: grayscale(0.7) contrast(1.3); transform: translateY(-18px) scale(0.98) skewX(-3deg); }
+      100% { opacity: 0; filter: grayscale(1) blur(8px); transform: translateY(-70px) scale(0.86) skewX(8deg); }
+    }
+
     .inspect-overlay {
       position: fixed;
       inset: 0;
@@ -560,9 +731,97 @@
       cursor: zoom-out;
     }
 
+    .inspect-panel {
+      display: grid;
+      place-items: center;
+      gap: 14px;
+    }
+
     .inspect-overlay img {
       box-shadow: 0 28px 70px rgba(0, 0, 0, 0.62);
       animation: inspect-card 220ms ease-out both;
+    }
+
+    .inspect-action {
+      min-width: 168px;
+      min-height: 46px;
+      border: 1px solid rgba(255, 213, 106, 0.62);
+      border-radius: 999px;
+      color: #2a1700;
+      background: linear-gradient(180deg, #ffe79c, #d59b36);
+      box-shadow: 0 6px 0 #6f4110, 0 16px 26px rgba(0,0,0,0.35);
+      font-size: 16px;
+      font-weight: 1000;
+      cursor: pointer;
+    }
+
+    .inspect-action:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+      filter: grayscale(0.7);
+    }
+
+    .predict-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 33;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(5px);
+    }
+
+    .predict-panel {
+      width: min(94vw, 520px);
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+      padding: 18px;
+      border: 1px solid rgba(255, 213, 106, 0.42);
+      border-radius: 24px;
+      background: linear-gradient(155deg, rgba(12, 49, 36, 0.96), rgba(21, 14, 8, 0.96));
+      box-shadow: 0 30px 80px rgba(0,0,0,0.65);
+    }
+
+    .predict-title {
+      color: var(--gold);
+      font-size: 24px;
+      font-weight: 1000;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.45);
+    }
+
+    .predict-cards {
+      display: flex;
+      gap: 16px;
+      align-items: start;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .predict-item {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .predict-item.dragging { opacity: 0.68; transform: scale(0.96); }
+
+    .predict-item img {
+      width: min(34vw, 170px);
+      aspect-ratio: 0.69;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 14px 26px rgba(0,0,0,0.42);
+      animation: inspect-card 220ms ease-out both;
+    }
+
+    .predict-label {
+      color: #fff8e8;
+      font-size: 14px;
+      font-weight: 900;
     }
 
     @keyframes inspect-card {
@@ -587,7 +846,7 @@
       16% { opacity: 1; }
       46% { opacity: 1; transform: translate(calc(-50vw - 18px), 0) rotate(-8deg) scale(1.06); }
       72% { opacity: 1; transform: translate(calc(-50vw - 34px), var(--target-y)) rotate(4deg) scale(1); }
-      100% { opacity: 0; transform: translate(calc(-50vw - 48px), var(--target-y)) rotate(0deg) scale(0.92); }
+      100% { opacity: 1; transform: translate(calc(-50vw - 48px), var(--target-y)) rotate(0deg) scale(0.92); }
     }
 
     @media (max-width: 430px) {
@@ -629,6 +888,7 @@
           <div class="score-pill">点数：<span id="dealer-score">?</span></div>
         </div>
         <div class="cards" id="dealer-cards" aria-label="庄家手牌"></div>
+        <div class="skill-count" id="dealer-skills" aria-label="庄家技能牌数量">技能牌数量：0</div>
       </section>
 
       <section class="center-panel" aria-live="polite">
@@ -644,6 +904,10 @@
           <div class="score-pill">点数：<span id="player-score">0</span></div>
         </div>
         <div class="cards" id="player-cards" aria-label="玩家手牌"></div>
+        <div class="hand-tabs" id="player-view-tabs" aria-label="玩家牌区切换">
+          <button class="hand-tab active" id="player-number-tab" type="button" data-view="numbers">数字牌</button>
+          <button class="hand-tab" id="player-skill-tab" type="button" data-view="skills">技能牌</button>
+        </div>
       </section>
     </section>
 
@@ -654,7 +918,7 @@
     </nav>
 
     <section class="rules">
-      <strong>当前规则：</strong>①数字牌只使用A-10四种花色共40张，没有J/Q/K/大小王。②A可算1或11。③每个回合只能抽1张数字牌，点击“结束回合”后切换至庄家回合。④双方都结束回合且不再抽牌时比较大小。
+      <strong>当前规则：</strong>①数字牌只使用A-10四种花色共40张，没有J/Q/K/大小王。②技能牌共12张且一局不重复，开局双方各2张，每回合开始50%概率获得1张。③每回合只能主动抽1张数字牌，技能牌不限使用数量。④双方都结束回合且不再抽牌时比较大小，21点或爆牌都不会提前结算。
     </section>
   </main>
 
@@ -666,8 +930,8 @@
     const backImageCandidates = ["img/背面.jpg", "img/背面.jpeg", "img/背面.png", "img/背面.webp", "img/背面.JPG", "img/背面.PNG"];
     const maxLives = 3;
     // 术语预留：A-10 扑克牌称为“数字牌”；未来加入的特殊卡称为“技能牌”。
-    // 未来技能牌规则预留：每回合抽数字牌前有 30% 概率先抽 1 张技能牌，每回合最多触发 1 次。
-    const skillCardChanceBeforeNumberCard = 0.3;
+    // 技能牌规则：每局12张不重复；每回合开始有50%概率获得1张剩余随机技能牌。
+    const turnSkillDrawChance = 0.5;
 
     const state = {
       deck: [],
@@ -682,6 +946,7 @@
       playerLives: maxLives,
       dealerLives: maxLives,
       gameOver: false,
+      matchStarted: false,
       animating: false,
       turn: "none",
       playerDrewThisTurn: false,
@@ -690,11 +955,22 @@
       dealerEndedCleanly: false,
       playerSkillDrawnThisTurn: false,
       dealerSkillDrawnThisTurn: false,
+      playerHoleRevealed: false,
+      dealerHoleRevealed: false,
+      playerView: "numbers",
+      effects: {
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
+      },
     };
 
     const elements = {
       dealerCards: document.querySelector("#dealer-cards"),
       playerCards: document.querySelector("#player-cards"),
+      dealerSkills: document.querySelector("#dealer-skills"),
+      playerViewTabs: document.querySelector("#player-view-tabs"),
+      playerNumberTab: document.querySelector("#player-number-tab"),
+      playerSkillTab: document.querySelector("#player-skill-tab"),
       dealerScore: document.querySelector("#dealer-score"),
       playerScore: document.querySelector("#player-score"),
       message: document.querySelector("#message"),
@@ -711,6 +987,19 @@
     elements.dealButton.addEventListener("click", startRound);
     elements.hitButton.addEventListener("click", playerHit);
     elements.standButton.addEventListener("click", endPlayerTurn);
+    elements.playerViewTabs.addEventListener("click", event => {
+      const button = event.target.closest(".hand-tab");
+      if (!button) return;
+      state.playerView = button.dataset.view;
+      render();
+    });
+
+    elements.playerCards.addEventListener("click", event => {
+      const shell = event.target.closest(".skill-card-shell");
+      if (!shell || state.playerView !== "skills") return;
+      const skill = state.playerSkills.find(card => card.id === shell.dataset.skillId);
+      if (skill) inspectSkill(skill);
+    });
 
     preloadDeckImages();
     loadAppIcon();
@@ -731,8 +1020,26 @@
     }
 
     function createSkillDeck() {
-      // 未来把技能牌素材和效果配置到这里；当前还没有技能牌，所以返回空牌组。
-      return [];
+      return [
+        ["peek", "透视", "让对手的隐藏牌翻至正面展示。"],
+        ["predict", "预判", "提前查看下一次要摸到的数字牌。"],
+        ["doublePredict", "预判的预判", "查看牌堆顶部2张数字牌，并可调换顺序。"],
+        ["reroll", "改运", "废弃1张自己明牌数字牌，重新抽1张数字牌。"],
+        ["lucky", "强运", "抽一张当前最有利的数字牌。"],
+        ["swap", "换牌", "双方随机交换一张明牌数字牌。"],
+        ["noCheat", "别出老千", "对手下个回合不能发动技能牌。"],
+        ["fate", "改命", "本回合抽牌后若爆牌，抽到的数字牌废弃。"],
+        ["bondA", "与A的羁绊", "自己下次抽牌优先抽到A。"],
+        ["seeThrough", "识破", "对方下次发动技能牌失效。"],
+        ["destroy", "破坏", "下次对手抽取的数字牌直接废弃。"],
+        ["gift", "赠品", "对手下次抽牌优先抽到8。"],
+      ].map(([id, name, effect]) => ({
+        id,
+        name,
+        effect,
+        label: name,
+        imageCandidates: imageExtensions.map(extension => `img/${name}.${extension}`),
+      }));
     }
 
     function dealInitialSkillCards() {
@@ -746,6 +1053,7 @@
     function preloadDeckImages() {
       [
         ...createDeck().flatMap(card => card.imageCandidates.slice(0, 4)),
+        ...createSkillDeck().flatMap(card => card.imageCandidates.slice(0, 4)),
         ...backImageCandidates,
       ].forEach(src => {
         const image = new Image();
@@ -809,12 +1117,19 @@
       state.animating = true;
       state.turn = "none";
       state.deck = shuffle(createDeck());
-      state.skillDeck = shuffle(createSkillDeck());
+      if (!state.matchStarted) {
+        state.skillDeck = shuffle(createSkillDeck());
+        state.playerSkills = dealInitialSkillCards();
+        state.dealerSkills = dealInitialSkillCards();
+        state.matchStarted = true;
+      }
       state.player = [];
       state.dealer = [];
-      state.playerSkills = dealInitialSkillCards();
-      state.dealerSkills = dealInitialSkillCards();
       state.dealerHidden = true;
+      state.playerHoleRevealed = false;
+      state.dealerHoleRevealed = false;
+      state.playerView = "numbers";
+      resetEffects();
       resetTurnFlags();
       state.playerEndedCleanly = false;
       state.dealerEndedCleanly = false;
@@ -837,19 +1152,11 @@
 
       state.roundActive = true;
       state.animating = false;
+      state.effects.dealer.blockSkills = false;
       state.turn = "player";
       resetTurnFlags();
-      setMessage("我的决策", "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。", true);
-
-      const playerBlackjack = isBlackjack(state.player);
-      const dealerBlackjack = isBlackjack(state.dealer);
-      if (playerBlackjack || dealerBlackjack) {
-        state.turn = "none";
-        state.dealerHidden = false;
-        if (playerBlackjack && dealerBlackjack) finishRound("push", "双方都是 Blackjack，平局，不扣生命。", false);
-        else if (playerBlackjack) finishRound("win", "Blackjack！庄家扣1颗生命。", false);
-        else finishRound("lose", "庄家 Blackjack，你扣1颗生命。", false);
-      }
+      await maybeGrantTurnSkill("player");
+      setMessage("我的决策", canUseSkills("player") ? "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
 
       render();
     }
@@ -859,20 +1166,14 @@
       state.animating = true;
       render();
 
-      const card = drawNumberCard();
+      const card = drawNumberCardFor("player");
       await showcaseCard(card);
-      state.player.push(card);
+      await resolveDrawnNumberCard("player", card);
       state.playerDrewThisTurn = true;
       state.playerEndedCleanly = false;
       state.animating = false;
 
-      const score = handValue(state.player).total;
-      if (score > 21) {
-        state.dealerHidden = false;
-        finishRound("lose", "你爆牌了，扣1颗生命。", false);
-      } else {
-        setMessage("我的决策", "本回合已抽1张数字牌，要牌按钮已锁定；你仍可使用技能牌，或点击“结束回合”。", true);
-      }
+      setMessage("我的决策", "本回合已抽1张数字牌，要牌按钮已锁定；即使21点或爆牌，也可继续使用技能牌，或点击“结束回合”。", true);
       render();
     }
 
@@ -881,6 +1182,7 @@
       state.animating = true;
       state.turn = "dealer";
       state.playerEndedCleanly = !state.playerDrewThisTurn;
+      state.effects.player.blockSkills = false;
       render();
       await runDealerTurn();
     }
@@ -888,27 +1190,20 @@
     async function runDealerTurn() {
       state.dealerDrewThisTurn = false;
       state.dealerSkillDrawnThisTurn = false;
+      await maybeGrantTurnSkill("dealer");
+      await maybeDealerUseSkill();
 
       if (dealerWantsCard()) {
-        const card = drawNumberCard();
+        const card = drawNumberCardFor("dealer");
         await showDealerDecision("庄家选择要牌");
         await showcaseCard(card, { hidden: true, alt: "庄家抽牌" });
-        state.dealer.push(card);
+        await resolveDrawnNumberCard("dealer", card);
         state.dealerDrewThisTurn = true;
         state.dealerEndedCleanly = false;
         render();
       } else {
         await showDealerDecision("庄家选择停牌");
         state.dealerEndedCleanly = true;
-      }
-
-      const dealerTotal = handValue(state.dealer).total;
-      if (dealerTotal > 21) {
-        state.dealerHidden = false;
-        finishRound("win", "庄家选择要牌后爆牌，庄家扣1颗生命。", false);
-        state.animating = false;
-        render();
-        return;
       }
 
       if (state.playerEndedCleanly && state.dealerEndedCleanly) {
@@ -918,11 +1213,352 @@
         return;
       }
 
+      state.effects.dealer.blockSkills = false;
       state.turn = "player";
       resetTurnFlags();
+      await maybeGrantTurnSkill("player");
       state.animating = false;
-      setMessage("我的决策", "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。", true);
+      setMessage("我的决策", canUseSkills("player") ? "你本回合可以抽1张数字牌，也可以先使用技能牌；点击“结束回合”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束回合”。", true);
       render();
+    }
+
+
+    function resetEffects() {
+      state.effects = {
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
+      };
+    }
+
+    function canUseSkills(owner) {
+      return !state.effects[owner].blockSkills;
+    }
+
+    async function maybeGrantTurnSkill(owner) {
+      if (!state.skillDeck.length || secureRandomInt(100) >= turnSkillDrawChance * 100) return;
+      const card = state.skillDeck.pop();
+      if (owner === "player") {
+        setMessage("获得技能牌", "你获得了1张随机技能牌。", true);
+        await showcaseCard(card, { alt: `获得技能牌${card.name}` });
+      } else {
+        setMessage("庄家获得1张技能牌", "庄家把新技能牌加入手牌，具体内容仍然保密。", true);
+        await wait(900);
+      }
+      state[`${owner}Skills`].push(card);
+      render();
+      await wait(300);
+    }
+
+    async function usePlayerSkill(skillId) {
+      if (!state.roundActive || state.animating || state.turn !== "player") return;
+      const index = state.playerSkills.findIndex(card => card.id === skillId);
+      if (index < 0) return;
+      if (!canUseSkills("player")) {
+        setMessage("我的决策", "本回合无法发动技能牌。", true);
+        return;
+      }
+      state.animating = true;
+      const [skill] = state.playerSkills.splice(index, 1);
+      await activateSkill("player", skill);
+      state.animating = false;
+      setMessage("我的决策", "你可以继续使用技能牌，或抽1张数字牌，或点击“结束回合”。", true);
+      render();
+    }
+
+    async function maybeDealerUseSkill() {
+      if (!state.dealerSkills.length || !canUseSkills("dealer") || secureRandomInt(100) >= 45) return;
+      const index = chooseDealerSkillIndex();
+      if (index < 0) return;
+      const [skill] = state.dealerSkills.splice(index, 1);
+      await activateSkill("dealer", skill);
+      render();
+    }
+
+    function chooseDealerSkillIndex() {
+      const preferred = ["lucky", "bondA", "peek", "destroy", "gift", "noCheat", "fate", "swap"];
+      for (const id of preferred) {
+        const index = state.dealerSkills.findIndex(card => card.id === id);
+        if (index >= 0) return index;
+      }
+      return state.dealerSkills.length ? 0 : -1;
+    }
+
+    async function activateSkill(owner, skill) {
+      const opponent = owner === "player" ? "dealer" : "player";
+      if (state.effects[owner].counterSkill) {
+        state.effects[owner].counterSkill = false;
+        setMessage("技能牌失效", `【${skill.name}】技能牌发动失效。`, true);
+        await wait(1500);
+        return;
+      }
+      await showSkillCard(owner, skill);
+      switch (skill.id) {
+        case "peek":
+          await revealOpponentHole(owner, opponent);
+          setMessage("透视成功", `${ownerName(owner)}看穿了对手的隐藏牌。`, true);
+          break;
+        case "predict":
+          await previewTopCards(1);
+          break;
+        case "doublePredict":
+          await previewTopCards(2, owner === "player");
+          break;
+        case "reroll":
+          await rerollVisibleCard(owner);
+          break;
+        case "lucky":
+          await drawBestCard(owner);
+          break;
+        case "swap":
+          await swapRandomVisibleCards();
+          break;
+        case "noCheat":
+          state.effects[opponent].blockSkills = true;
+          setMessage("别出老千", `${ownerName(opponent)}下个回合无法发动技能牌。`, true);
+          break;
+        case "fate":
+          state.effects[owner].fateChange = true;
+          setMessage("改命", `${ownerName(owner)}本回合抽牌若爆牌，抽到的数字牌会废弃。`, true);
+          break;
+        case "bondA":
+          await setForcedRank(owner, "A", "与A的羁绊");
+          break;
+        case "seeThrough":
+          state.effects[opponent].counterSkill = true;
+          setMessage("识破", `${ownerName(opponent)}下次发动技能牌会失效。`, true);
+          break;
+        case "destroy":
+          state.effects[opponent].destroyNextDraw = true;
+          setMessage("破坏", `${ownerName(opponent)}下次抽取的数字牌会直接废弃。`, true);
+          break;
+        case "gift":
+          await setForcedRank(opponent, "8", "赠品");
+          break;
+      }
+      render();
+      await wait(900);
+    }
+
+    function ownerName(owner) {
+      return owner === "player" ? "玩家" : "庄家";
+    }
+
+    async function showSkillCard(owner, skill) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const card = document.createElement("div");
+        const img = document.createElement("img");
+        const name = document.createElement("div");
+        const caption = document.createElement("div");
+        overlay.className = "skill-showcase";
+        card.className = "skill-showcase-card";
+        name.className = "skill-showcase-name";
+        caption.className = "skill-showcase-caption";
+        name.textContent = skill.name;
+        caption.textContent = `${ownerName(owner)}发动了技能牌`;
+        img.alt = skill.name;
+        setResilientImage(img, skill.imageCandidates, skill.name);
+        card.append(img, name, caption);
+        overlay.appendChild(card);
+        document.body.appendChild(overlay);
+        setTimeout(() => card.classList.add("ash-out"), 2000);
+        setTimeout(() => {
+          overlay.remove();
+          resolve();
+        }, 2900);
+      });
+    }
+
+    async function revealOpponentHole(owner, opponent) {
+      const hand = state[opponent];
+      const holeIndex = opponent === "dealer" ? 1 : state.playerHoleIndex;
+      const holeCard = hand[holeIndex];
+      if (!holeCard) return;
+      await showcaseCard(holeCard, { alt: `${ownerName(owner)}透视${ownerName(opponent)}隐藏牌` });
+      state[`${opponent}HoleRevealed`] = true;
+      if (opponent === "dealer") state.dealerHidden = false;
+      render();
+    }
+
+    async function previewTopCards(count, allowSwap = false) {
+      const cards = state.deck.slice(-count).reverse();
+      if (!cards.length) {
+        setMessage(count === 1 ? "预判" : "预判的预判", "牌堆为空。", true);
+        await wait(1000);
+        return;
+      }
+      if (count === 1) {
+        setMessage("预判", `牌堆第一张：${cards[0].label}`, true);
+        await showcaseCard(cards[0], { alt: `预判${cards[0].label}` });
+        await wait(600);
+        return;
+      }
+      if (allowSwap && cards.length === 2) {
+        await showDoublePredictOverlay(cards);
+        return;
+      }
+      setMessage("预判的预判", cards.map((card, index) => `牌堆第${index + 1}张：${card.label}`).join("；"), true);
+      await wait(2500);
+    }
+
+    function showDoublePredictOverlay(cards) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const panel = document.createElement("div");
+        const title = document.createElement("div");
+        const cardRow = document.createElement("div");
+        const done = document.createElement("button");
+        let swapped = false;
+        let dragIndex = null;
+
+        overlay.className = "predict-overlay";
+        panel.className = "predict-panel";
+        title.className = "predict-title";
+        cardRow.className = "predict-cards";
+        done.className = "inspect-action";
+        done.type = "button";
+        title.textContent = "预判的预判";
+        done.textContent = "调整完毕";
+
+        const renderPreview = () => {
+          cardRow.innerHTML = "";
+          const display = swapped ? [cards[1], cards[0]] : cards;
+          display.forEach((card, index) => {
+            const item = document.createElement("div");
+            const img = document.createElement("img");
+            const label = document.createElement("div");
+            item.className = "predict-item";
+            item.draggable = true;
+            item.dataset.index = index;
+            img.alt = `${index === 0 ? "牌堆第一张" : "牌堆第二张"}${card.label}`;
+            img.draggable = false;
+            label.className = "predict-label";
+            label.textContent = index === 0 ? "牌堆第一张" : "牌堆第二张";
+            setResilientImage(img, card.imageCandidates, img.alt);
+            item.append(img, label);
+            item.addEventListener("click", () => { swapped = !swapped; renderPreview(); });
+            item.addEventListener("dragstart", event => { dragIndex = index; item.classList.add("dragging"); event.dataTransfer.effectAllowed = "move"; });
+            item.addEventListener("dragend", () => item.classList.remove("dragging"));
+            item.addEventListener("dragover", event => event.preventDefault());
+            item.addEventListener("drop", event => {
+              event.preventDefault();
+              if (dragIndex !== null && dragIndex !== index) {
+                swapped = !swapped;
+                renderPreview();
+              }
+              dragIndex = null;
+            });
+            cardRow.appendChild(item);
+          });
+        };
+
+        done.addEventListener("click", async () => {
+          if (swapped) {
+            const top = state.deck.pop();
+            const second = state.deck.pop();
+            state.deck.push(top, second);
+          }
+          overlay.remove();
+          setMessage("调整完毕", swapped ? "牌堆顶部两张数字牌已调换顺序。" : "牌堆顶部两张数字牌保持原顺序。", true);
+          await wait(700);
+          resolve();
+        });
+
+        renderPreview();
+        panel.append(title, cardRow, done);
+        overlay.appendChild(panel);
+        document.body.appendChild(overlay);
+      });
+    }
+
+    async function rerollVisibleCard(owner) {
+      const hand = state[owner];
+      const candidates = hand.map((card, index) => ({ card, index })).filter(({ index }) => !(owner === "dealer" && index === 1 && !state.dealerHoleRevealed) && !(owner === "player" && index === state.playerHoleIndex && !state.playerHoleRevealed));
+      if (!candidates.length) {
+        setMessage("改运失败", "没有可以废弃的明牌数字牌。", true);
+        await wait(1200);
+        return;
+      }
+      const chosen = owner === "player" ? candidates[0] : candidates[secureRandomInt(candidates.length)];
+      hand.splice(chosen.index, 1);
+      setMessage("改运", `${ownerName(owner)}废弃了${chosen.card.label}，重新抽取1张数字牌。`, true);
+      await wait(900);
+      const newCard = drawNumberCardFor(owner);
+      await showcaseCard(newCard, { hidden: owner === "dealer", alt: `${ownerName(owner)}重新抽牌` });
+      await resolveDrawnNumberCard(owner, newCard);
+    }
+
+    async function drawBestCard(owner) {
+      const total = handValue(state[owner]).total;
+      let bestIndex = -1;
+      let bestScore = Infinity;
+      state.deck.forEach((card, index) => {
+        const value = cardValueForBust(card);
+        const after = total + value;
+        const score = after <= 21 ? 21 - after : after - 21 + 30;
+        if (score < bestScore) {
+          bestScore = score;
+          bestIndex = index;
+        }
+      });
+      if (bestIndex < 0) return;
+      const [card] = state.deck.splice(bestIndex, 1);
+      setMessage("强运", `${ownerName(owner)}抽取了最有利的数字牌。`, true);
+      await showcaseCard(card, { hidden: owner === "dealer", alt: `${ownerName(owner)}强运抽牌` });
+      await resolveDrawnNumberCard(owner, card);
+    }
+
+    async function swapRandomVisibleCards() {
+      const playerOptions = state.player.map((card, index) => ({ card, index })).filter(({ index }) => index !== state.playerHoleIndex || state.playerHoleRevealed);
+      const dealerOptions = state.dealer.map((card, index) => ({ card, index })).filter(({ index }) => index !== 1 || state.dealerHoleRevealed);
+      if (!playerOptions.length || !dealerOptions.length) {
+        setMessage("换牌失败", "双方没有足够的明牌数字牌可交换。", true);
+        await wait(1200);
+        return;
+      }
+      const p = playerOptions[secureRandomInt(playerOptions.length)];
+      const d = dealerOptions[secureRandomInt(dealerOptions.length)];
+      [state.player[p.index], state.dealer[d.index]] = [d.card, p.card];
+      setMessage("换牌", `双方交换了${p.card.label}与${d.card.label}。`, true);
+      await wait(1200);
+    }
+
+    async function setForcedRank(owner, rank, skillName) {
+      if (state.deck.some(card => card.rank === rank)) {
+        state.effects[owner].forceRank = rank;
+        setMessage(skillName, `${ownerName(owner)}下次抽牌将优先抽到${rank}。`, true);
+      } else {
+        setMessage(`${skillName}发动失效`, `牌堆中已经没有${rank}。`, true);
+      }
+      await wait(1200);
+    }
+
+    async function resolveDrawnNumberCard(owner, card) {
+      const effect = state.effects[owner];
+      if (effect.destroyNextDraw) {
+        effect.destroyNextDraw = false;
+        setMessage("数字牌被破坏", `${ownerName(owner)}抽到的${card.label}被废弃。`, true);
+        await wait(1000);
+        return;
+      }
+      const hand = state[owner];
+      if (effect.fateChange && handValue([...hand, card]).total > 21) {
+        effect.fateChange = false;
+        setMessage("改命生效", `${ownerName(owner)}抽到的${card.label}导致爆牌，已废弃。`, true);
+        await wait(1000);
+        return;
+      }
+      effect.fateChange = false;
+      hand.push(card);
+    }
+
+    function compareTotals(playerTotal, dealerTotal) {
+      const playerBust = playerTotal > 21;
+      const dealerBust = dealerTotal > 21;
+      if (!playerBust && dealerBust) return 1;
+      if (playerBust && !dealerBust) return -1;
+      if (playerBust && dealerBust) return dealerTotal - playerTotal;
+      return playerTotal - dealerTotal;
     }
 
     function resetTurnFlags() {
@@ -937,9 +1573,10 @@
       state.dealerHidden = false;
       const playerTotal = handValue(state.player).total;
       const dealerTotal = handValue(state.dealer).total;
-      if (playerTotal > dealerTotal) finishRound("win", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，庄家扣1颗生命。`, false);
-      else if (playerTotal < dealerTotal) finishRound("lose", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，你扣1颗生命。`, false);
-      else finishRound("push", `双方都是 ${playerTotal} 点，平局，不扣生命。`, false);
+      const result = compareTotals(playerTotal, dealerTotal);
+      if (result > 0) finishRound("win", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，庄家扣1颗生命。`, false);
+      else if (result < 0) finishRound("lose", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，你扣1颗生命。`, false);
+      else finishRound("push", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，平局，不扣生命。`, false);
     }
 
     function dealerWantsCard() {
@@ -961,6 +1598,17 @@
     function drawNumberCard() {
       if (!state.deck.length) state.deck = shuffle(createDeck());
       return state.deck.pop();
+    }
+
+    function drawNumberCardFor(owner) {
+      const effect = state.effects[owner];
+      const forcedRank = effect.forceRank;
+      if (forcedRank) {
+        effect.forceRank = null;
+        const index = state.deck.findIndex(card => card.rank === forcedRank);
+        if (index >= 0) return state.deck.splice(index, 1)[0];
+      }
+      return drawNumberCard();
     }
 
     function handValue(hand) {
@@ -1009,6 +1657,7 @@
       state.playerLives = maxLives;
       state.dealerLives = maxLives;
       state.gameOver = false;
+      state.matchStarted = false;
       state.roundActive = false;
       state.dealerHidden = true;
       state.turn = "none";
@@ -1021,6 +1670,8 @@
       state.dealerSkills = [];
       state.deck = [];
       state.skillDeck = [];
+      state.playerView = "numbers";
+      resetEffects();
       setMessage("新的一场开始", "牌组只有A-10共40张，A可算1或11。", true);
     }
 
@@ -1044,8 +1695,10 @@
     }
 
     function render() {
-      renderHand(elements.playerCards, state.player, false, "player", state.playerHoleIndex);
-      renderHand(elements.dealerCards, state.dealer, state.dealerHidden, "dealer");
+      if (state.playerView === "skills") renderSkillHand(elements.playerCards, state.playerSkills);
+      else renderHand(elements.playerCards, state.player, false, "player", state.playerHoleIndex);
+      renderHand(elements.dealerCards, state.dealer, state.dealerHidden && !state.dealerHoleRevealed, "dealer");
+      renderSkills();
 
       elements.playerScore.textContent = state.player.length ? handValue(state.player).total : 0;
       elements.dealerScore.textContent = state.dealer.length
@@ -1068,10 +1721,11 @@
       container.innerHTML = "";
       hand.forEach((card, index) => {
         const hidden = hideSecondCard && index === 1;
-        const playerHole = owner === "player" && index === playerHoleIndex;
+        const playerHole = owner === "player" && index === playerHoleIndex && !state.playerHoleRevealed;
+        const revealedHole = (owner === "dealer" && index === 1 && state.dealerHoleRevealed) || (owner === "player" && index === playerHoleIndex && state.playerHoleRevealed);
         const shell = document.createElement("div");
         const img = document.createElement("img");
-        shell.className = `card-shell ${owner}-card${hidden ? " hidden-card back-card" : ""}${playerHole ? " player-hole-card" : ""}`;
+        shell.className = `card-shell ${owner}-card${hidden ? " hidden-card back-card" : ""}${playerHole ? " player-hole-card" : ""}${revealedHole ? " revealed-hole-card" : ""}`;
         img.className = `card${hidden ? " card-back" : ""}`;
         img.alt = hidden ? "庄家暗牌" : playerHole ? `${card.label}，己方盖牌` : card.label;
         img.draggable = false;
@@ -1089,6 +1743,46 @@
             }
           });
         }
+        container.appendChild(shell);
+      });
+    }
+
+    function renderSkills() {
+      elements.playerNumberTab.classList.toggle("active", state.playerView === "numbers");
+      elements.playerSkillTab.classList.toggle("active", state.playerView === "skills");
+      elements.playerNumberTab.setAttribute("aria-pressed", state.playerView === "numbers");
+      elements.playerSkillTab.setAttribute("aria-pressed", state.playerView === "skills");
+      elements.dealerSkills.textContent = `技能牌数量：${state.dealerSkills.length}`;
+    }
+
+    function renderSkillHand(container, skills) {
+      container.innerHTML = "";
+      if (!skills.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-skill-hint";
+        empty.textContent = "当前没有技能牌";
+        container.appendChild(empty);
+        return;
+      }
+      skills.forEach(skill => {
+        const shell = document.createElement("div");
+        const img = document.createElement("img");
+        shell.className = "card-shell skill-card-shell";
+        shell.dataset.skillId = skill.id;
+        shell.tabIndex = 0;
+        shell.setAttribute("role", "button");
+        shell.setAttribute("aria-label", `查看技能牌${skill.name}`);
+        img.className = "card";
+        img.alt = skill.name;
+        img.draggable = false;
+        setResilientImage(img, skill.imageCandidates, skill.name);
+        shell.appendChild(img);
+        shell.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            inspectSkill(skill);
+          }
+        });
         container.appendChild(shell);
       });
     }
@@ -1143,14 +1837,44 @@
 
     function inspectCard(card) {
       const overlay = document.createElement("div");
+      const panel = document.createElement("div");
       const image = document.createElement("img");
       overlay.className = "inspect-overlay";
+      panel.className = "inspect-panel";
       image.alt = `放大查看${card.label}`;
       image.draggable = false;
       setResilientImage(image, card.imageCandidates, image.alt);
-      overlay.appendChild(image);
+      panel.appendChild(image);
+      overlay.appendChild(panel);
       document.body.appendChild(overlay);
       overlay.addEventListener("click", () => overlay.remove(), { once: true });
+    }
+
+    function inspectSkill(skill) {
+      const overlay = document.createElement("div");
+      const panel = document.createElement("div");
+      const image = document.createElement("img");
+      const action = document.createElement("button");
+      overlay.className = "inspect-overlay";
+      panel.className = "inspect-panel";
+      image.alt = `查看技能牌${skill.name}`;
+      image.draggable = false;
+      action.className = "inspect-action";
+      action.type = "button";
+      action.textContent = "发动技能牌";
+      action.disabled = !state.roundActive || state.animating || state.turn !== "player" || !canUseSkills("player");
+      if (action.disabled) action.title = "当前不能发动技能牌";
+      setResilientImage(image, skill.imageCandidates, skill.name);
+      panel.append(image, action);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+      panel.addEventListener("click", event => event.stopPropagation());
+      overlay.addEventListener("click", () => overlay.remove(), { once: true });
+      action.addEventListener("click", () => {
+        if (action.disabled) return;
+        overlay.remove();
+        usePlayerSkill(skill.id);
+      });
     }
 
     function showcaseCard(card, options = {}) {
