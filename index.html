@@ -942,7 +942,7 @@
       <section class="center-panel" aria-live="polite">
         <div>
           <p class="message" id="message">点击“发牌”开始第一局</p>
-          <p class="hint" id="hint">牌组只有A-10共40张，A可算1或11。</p>
+          <p class="hint" id="hint">双方轮流发牌，都不再要牌后接近21点胜。单方＞21点输。双方＞21点，接近21点胜。</p>
         </div>
       </section>
 
@@ -1181,7 +1181,7 @@
       resetTurnFlags();
       state.playerEndedCleanly = false;
       state.dealerEndedCleanly = false;
-      setMessage("发牌中", "数字牌将从牌桌右侧依次进入。", true);
+      setMessage("发牌中", "双方轮流发牌，都不再要牌后接近21点胜。单方＞21点输。双方＞21点，接近21点胜。", true);
       render();
 
       const initialDeal = [
@@ -1750,7 +1750,7 @@
       state.skillDeck = [];
       state.playerView = "numbers";
       resetEffects();
-      setMessage("新的一场开始", "牌组只有A-10共40张，A可算1或11。", true);
+      setMessage("新的一场开始", "双方轮流发牌，都不再要牌后接近21点胜。单方＞21点输。双方＞21点，接近21点胜。", true);
     }
 
     function setMessage(message, hint, resetClass = true) {
