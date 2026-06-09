@@ -426,16 +426,24 @@
     .zone.has-overflow::after { display: grid; }
 
     .skill-count {
-      min-height: 30px;
-      display: flex;
+      position: absolute;
+      left: 56px;
+      top: 42px;
+      z-index: 4;
+      min-height: 22px;
+      display: inline-flex;
       align-items: center;
       justify-content: center;
-      padding: 0 4px 4px;
-      color: rgba(255,248,232,0.86);
-      font-size: 13px;
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: rgba(255,248,232,0.9);
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
       font-weight: 900;
       letter-spacing: 0.04em;
       text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+      pointer-events: none;
     }
 
     .hand-tabs {
@@ -1746,25 +1754,33 @@
     async function runDealerTurn() {
       state.dealerDrewThisTurn = false;
       state.dealerSkillDrawnThisTurn = false;
-      await maybeGrantTurnSkill("dealer");
-      await maybeDealerUseSkill();
-      if (settleIfNumberDeckEmpty()) return;
 
-      if (dealerWantsCard()) {
-        const card = drawNumberCardFor("dealer");
-        if (!card) {
-          settleIfNumberDeckEmpty();
-          return;
-        }
-        await showDealerDecision("庄家选择要牌");
-        await showcaseCard(card, { hidden: true, alt: "庄家抽牌" });
-        await resolveDrawnNumberCard("dealer", card);
-        state.dealerDrewThisTurn = true;
-        state.dealerEndedCleanly = false;
-        render();
-      } else {
+      if (handValue(state.dealer).total >= 21) {
         await showDealerDecision("庄家选择停牌");
         state.dealerEndedCleanly = true;
+      } else {
+        await maybeGrantTurnSkill("dealer");
+        if (handValue(state.dealer).total < 21) await maybeDealerUseSkill();
+        if (settleIfNumberDeckEmpty()) return;
+      }
+
+      if (!state.dealerEndedCleanly) {
+        if (dealerWantsCard()) {
+          const card = drawNumberCardFor("dealer");
+          if (!card) {
+            settleIfNumberDeckEmpty();
+            return;
+          }
+          await showDealerDecision("庄家选择要牌");
+          await showcaseCard(card, { hidden: true, alt: "庄家抽牌" });
+          await resolveDrawnNumberCard("dealer", card);
+          state.dealerDrewThisTurn = true;
+          state.dealerEndedCleanly = false;
+          render();
+        } else {
+          await showDealerDecision("庄家选择停牌");
+          state.dealerEndedCleanly = true;
+        }
       }
 
       if (settleIfNumberDeckEmpty()) return;
