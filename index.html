@@ -239,6 +239,71 @@
       pointer-events: none;
     }
 
+
+    .table-grime {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0.92;
+    }
+
+    .table-grime::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(32deg, transparent 0 22px, rgba(0,0,0,0.12) 23px 24px, transparent 25px 48px),
+        repeating-linear-gradient(116deg, transparent 0 34px, rgba(210,201,177,0.035) 35px 36px, transparent 37px 74px),
+        linear-gradient(90deg, rgba(0,0,0,0.24), transparent 18%, transparent 76%, rgba(0,0,0,0.28));
+      mix-blend-mode: multiply;
+    }
+
+    .table-grime::after {
+      content: "";
+      position: absolute;
+      left: 11%;
+      top: 15%;
+      width: 48%;
+      height: 19%;
+      background:
+        radial-gradient(ellipse at 16% 46%, rgba(80, 4, 7, 0.48), transparent 30%),
+        radial-gradient(ellipse at 41% 35%, rgba(105, 7, 10, 0.32), transparent 24%),
+        linear-gradient(100deg, rgba(74, 4, 6, 0.34), rgba(74,4,6,0.1) 58%, transparent);
+      filter: blur(10px);
+      transform: rotate(-9deg);
+      opacity: 0.8;
+      mix-blend-mode: multiply;
+    }
+
+    .blood-smear {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(89, 3, 6, 0.68), rgba(130, 9, 13, 0.24), transparent);
+      filter: blur(3px);
+      mix-blend-mode: multiply;
+      opacity: 0.78;
+    }
+
+    .blood-smear.one { left: 9%; top: 25%; width: 22%; height: 8%; transform: rotate(-18deg); border-radius: 58% 42% 54% 46%; }
+    .blood-smear.two { right: 12%; bottom: 24%; width: 19%; height: 6%; transform: rotate(28deg); border-radius: 48% 52% 38% 62%; }
+    .blood-smear.three { left: 48%; top: 56%; width: 26%; height: 5%; transform: rotate(8deg); border-radius: 999px; opacity: 0.5; }
+
+    .scratch-mark {
+      position: absolute;
+      width: 28%;
+      height: 1px;
+      background: rgba(215, 201, 177, 0.1);
+      box-shadow: 0 8px 0 rgba(215, 201, 177, 0.055), 0 17px 0 rgba(215, 201, 177, 0.04);
+      transform: rotate(-16deg);
+      opacity: 0.65;
+    }
+
+    .scratch-mark.one { right: 10%; top: 34%; }
+    .scratch-mark.two { left: 12%; bottom: 29%; transform: rotate(14deg); }
+
     .zone {
       position: relative;
       z-index: 1;
@@ -720,260 +785,145 @@
       inset: 0;
       z-index: 70;
       display: grid;
-      place-items: center;
-      padding: max(14px, env(safe-area-inset-top)) 14px max(14px, env(safe-area-inset-bottom));
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom));
       background:
-        radial-gradient(circle at 50% 20%, rgba(128, 10, 10, 0.42), transparent 26rem),
-        radial-gradient(circle at 52% 78%, rgba(116, 6, 9, 0.2), transparent 21rem),
-        linear-gradient(180deg, #030202, #07110d 44%, #020403);
+        radial-gradient(circle at 50% 18%, rgba(92, 4, 8, 0.34), transparent 26rem),
+        linear-gradient(180deg, #030202, #07110d 48%, #010202);
       overflow: hidden;
-    }
-
-    .story-modal::before,
-    .story-modal::after {
-      content: "";
-      position: absolute;
-      inset: -12%;
-      pointer-events: none;
     }
 
     .story-modal::before {
-      background:
-        repeating-linear-gradient(95deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 28px),
-        radial-gradient(circle at center, transparent 0 34%, rgba(0,0,0,0.62) 76%);
-      animation: story-noise 5s steps(6) infinite;
-      opacity: 0.58;
-    }
-
-    .story-modal::after {
-      background: radial-gradient(ellipse at center, transparent 0 50%, rgba(0,0,0,0.7) 82%);
-    }
-
-    .story-panel {
-      position: relative;
-      z-index: 1;
-      width: min(94vw, 520px);
-      min-height: min(82svh, 720px);
-      display: grid;
-      grid-template-rows: 1fr auto;
-      overflow: hidden;
-      border-radius: 28px;
-      border: 1px solid rgba(128, 18, 22, 0.68);
-      background:
-        radial-gradient(circle at 18% 20%, rgba(100, 4, 7, 0.26), transparent 9rem),
-        linear-gradient(180deg, rgba(3, 8, 6, 0.76), rgba(7, 20, 14, 0.94)),
-        radial-gradient(circle at 50% 36%, rgba(9, 58, 40, 0.38), transparent 18rem),
-        linear-gradient(145deg, #180404, #061611 58%, #020303);
-      box-shadow: 0 30px 90px rgba(0,0,0,0.84), inset 0 0 45px rgba(151, 12, 18, 0.1);
-    }
-
-    .story-panel::before {
       content: "";
       position: absolute;
-      inset: 14px;
-      border: 1px dashed rgba(128, 18, 22, 0.5);
-      border-radius: 22px;
+      inset: -10%;
+      background:
+        repeating-linear-gradient(95deg, rgba(255,255,255,0.028) 0 1px, transparent 1px 28px),
+        radial-gradient(circle at center, transparent 0 38%, rgba(0,0,0,0.62) 80%);
+      animation: story-noise 5s steps(6) infinite;
+      opacity: 0.54;
       pointer-events: none;
     }
 
-    .story-skip {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      z-index: 3;
-      min-height: 34px;
-      padding: 0 14px;
-      color: #f4d7d7;
+    .story-topbar,
+    .story-footer {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 520px);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .story-counter {
+      color: rgba(244, 215, 215, 0.78);
       font-size: 13px;
-      background: rgba(35, 3, 5, 0.72);
-      border: 1px solid rgba(255, 48, 61, 0.32);
-      box-shadow: 0 0 16px rgba(145, 8, 14, 0.2);
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.6);
     }
 
     .story-stage {
       position: relative;
-      min-height: 430px;
+      z-index: 1;
+      min-height: 0;
       display: grid;
-      place-items: end center;
-      padding: 66px 28px 28px;
-      isolation: isolate;
+      place-items: center;
+      width: min(100%, 540px);
+      margin: 0 auto;
+      animation: story-image-enter 420ms ease-out both;
     }
 
-    .story-visual {
-      position: absolute;
-      inset: 0;
+    .story-frame {
+      position: relative;
+      height: 100%;
+      max-height: 100%;
+      aspect-ratio: 500 / 888;
+      max-width: 100%;
+      border: 1px solid rgba(151, 12, 18, 0.68);
+      border-radius: 4px;
       overflow: hidden;
-      z-index: -1;
+      background: #050302;
+      box-shadow: 0 26px 70px rgba(0,0,0,0.82), 0 0 0 1px rgba(0,0,0,0.75), 0 0 36px rgba(151, 12, 18, 0.22);
     }
 
-    .story-visual::before {
+    .story-frame::after {
       content: "";
       position: absolute;
-      left: 50%;
-      top: 44%;
-      width: 94%;
-      aspect-ratio: 1.5;
-      border-radius: 50%;
-      transform: translate(-50%, -50%) rotate(-6deg);
-      background:
-        repeating-radial-gradient(ellipse at center, transparent 0 18px, rgba(0,0,0,0.12) 19px 20px),
-        radial-gradient(circle at 25% 35%, rgba(110, 4, 8, 0.24), transparent 4rem),
-        radial-gradient(ellipse at center, rgba(10, 78, 52, 0.34), rgba(5, 42, 29, 0.2) 58%, transparent 72%);
-      border: 1px solid rgba(128, 18, 22, 0.26);
-      filter: blur(0.2px);
-      animation: story-table 760ms ease-out both;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 70px rgba(0,0,0,0.36);
     }
 
-    .story-orb {
-      position: absolute;
-      left: 50%;
-      top: 34%;
-      width: min(48vw, 230px);
-      aspect-ratio: 1;
-      border-radius: 50%;
-      transform: translate(-50%, -50%);
-      background: radial-gradient(circle, rgba(151, 12, 18, 0.3), rgba(151, 11, 11, 0.18) 42%, transparent 68%);
-      filter: blur(12px);
-      animation: story-pulse 3.2s ease-in-out infinite;
-    }
-
-    .story-dealer-shadow {
-      position: absolute;
-      left: 50%;
-      top: 23%;
-      width: min(38vw, 176px);
-      height: min(42vw, 198px);
-      transform: translate(-50%, -50%) scale(0.92);
-      opacity: 0.8;
-      background:
-        radial-gradient(circle at 50% 22%, rgba(0,0,0,0.96) 0 21%, transparent 22%),
-        radial-gradient(ellipse at 50% 76%, rgba(0,0,0,0.98) 0 54%, transparent 56%);
-      filter: drop-shadow(0 18px 34px rgba(0,0,0,0.78));
-      animation: story-dealer 720ms ease-out both;
-    }
-
-    .story-card-ghost,
-    .story-card-back {
-      position: absolute;
-      width: min(18vw, 82px);
-      aspect-ratio: 200 / 309;
-      border-radius: 8px;
-      border: 1px solid rgba(132, 18, 22, 0.72);
-      background: linear-gradient(145deg, #2a0708, #94111a 28%, #170405 72%, #5a080e);
-      box-shadow: 0 18px 34px rgba(0,0,0,0.45);
-      opacity: 0.86;
-    }
-
-    .story-card-ghost.one { left: 16%; top: 34%; transform: rotate(-18deg); animation: story-fly-left 900ms ease-out both; }
-    .story-card-ghost.two { right: 14%; top: 38%; transform: rotate(14deg); animation: story-fly-right 980ms ease-out both; }
-    .story-card-back { left: 50%; top: 43%; transform: translate(-50%, -50%) rotate(3deg) scale(1.2); animation: story-card-zoom 1s ease-out both; }
-
-    .story-hearts {
-      position: absolute;
-      left: 50%;
-      top: 28%;
-      transform: translateX(-50%);
-      display: flex;
-      gap: 12px;
-      font-size: clamp(30px, 9vw, 46px);
-      color: var(--danger);
-      text-shadow: 0 0 16px rgba(255, 46, 46, 0.62), 0 4px 0 rgba(0,0,0,0.42);
-      animation: story-heart-pop 780ms ease-out both;
-    }
-
-    .story-hearts span:nth-child(2) { animation-delay: 120ms; }
-    .story-hearts span:nth-child(3) { animation-delay: 240ms; filter: saturate(1.4); }
-
-    .story-content {
+    .story-image {
       width: 100%;
-      padding: 18px;
-      border-radius: 22px;
-      background: linear-gradient(180deg, rgba(0,0,0,0.38), rgba(0,0,0,0.62));
-      border: 1px solid rgba(128, 18, 22, 0.42);
-      box-shadow: inset 0 0 24px rgba(0,0,0,0.34), 0 18px 38px rgba(0,0,0,0.38);
-      animation: story-text-in 360ms ease-out both;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #050302;
+      animation: story-image-focus 420ms ease-out both;
     }
 
-    .story-kicker {
-      color: rgba(255, 107, 107, 0.88);
-      font-size: 12px;
+    .story-skip,
+    .story-next {
+      min-height: 38px;
+      color: #f4d7d7;
+      background: linear-gradient(180deg, rgba(62, 5, 8, 0.96), rgba(20, 2, 3, 0.98));
+      border: 1px solid rgba(255, 48, 61, 0.42);
+      box-shadow: 0 5px 0 #160102, 0 14px 22px rgba(0,0,0,0.38), inset 0 0 16px rgba(255, 48, 61, 0.1);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.62);
+    }
+
+    .story-skip {
+      min-width: 78px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .story-next {
+      flex: 0 0 auto;
+      min-width: 130px;
+      min-height: 46px;
+      border-radius: 16px;
+      font-size: 16px;
       font-weight: 1000;
-      letter-spacing: 0.24em;
-    }
-
-    .story-title {
-      margin: 6px 0 12px;
-      color: var(--blood-bright);
-      font-size: clamp(25px, 7vw, 36px);
-      line-height: 1.05;
-      font-weight: 1000;
-      text-shadow: 0 3px 0 rgba(0,0,0,0.58), 0 0 18px rgba(145, 8, 14, 0.24);
-    }
-
-    .story-text {
-      min-height: 112px;
-      margin: 0;
-      color: #d8c8c8;
-      font-size: clamp(16px, 4.35vw, 19px);
-      line-height: 1.72;
-      font-weight: 700;
-      white-space: pre-line;
-    }
-
-    .story-footer {
-      display: grid;
-      gap: 12px;
-      padding: 0 22px 22px;
     }
 
     .story-progress {
       display: flex;
+      align-items: center;
       justify-content: center;
       gap: 8px;
+      min-height: 46px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.26);
+      border: 1px solid rgba(255,255,255,0.06);
     }
 
     .story-dot {
       width: 8px;
       height: 8px;
       border-radius: 50%;
-      background: rgba(255,255,255,0.22);
+      background: rgba(216, 200, 200, 0.28);
       box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+      transition: width 180ms ease, background 180ms ease, box-shadow 180ms ease;
     }
 
     .story-dot.active {
-      width: 22px;
+      width: 24px;
       border-radius: 999px;
       background: var(--blood-bright);
       box-shadow: 0 0 14px rgba(255, 48, 61, 0.48);
     }
 
-    .story-next {
-      min-height: 52px;
-      border-radius: 18px;
-      color: #fff0ee;
-      font-size: 17px;
-      background: linear-gradient(180deg, #b1121c, #5c070c);
-      border: 1px solid rgba(255, 48, 61, 0.58);
-      box-shadow: 0 5px 0 #250305, 0 14px 24px rgba(0,0,0,0.42), inset 0 0 18px rgba(255, 48, 61, 0.12);
-      text-shadow: 0 2px 0 rgba(0,0,0,0.48);
-    }
-
-    .story-scene-1 .story-dealer-shadow { opacity: 0.34; filter: blur(2px) drop-shadow(0 18px 34px rgba(0,0,0,0.9)); }
-    .story-scene-2 .story-visual { animation: story-shake 650ms ease-in-out both; }
-    .story-scene-3 .story-card-ghost { opacity: 0.18; }
-    .story-scene-4 .story-dealer-shadow { transform: translate(-50%, -50%) scale(1.2); opacity: 0.95; }
-    .story-scene-5 .story-card-back { transform: translate(-50%, -50%) rotate(0deg) scale(1.55); box-shadow: 0 0 44px rgba(151, 12, 18, 0.3), 0 26px 60px rgba(0,0,0,0.64); }
-
     @keyframes story-noise { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-1.5%, 1%); } }
-    @keyframes story-table { from { opacity: 0; transform: translate(-50%, -40%) rotate(-10deg) scale(1.18); } to { opacity: 1; transform: translate(-50%, -50%) rotate(-6deg) scale(1); } }
-    @keyframes story-pulse { 0%, 100% { opacity: 0.55; transform: translate(-50%, -50%) scale(0.92); } 50% { opacity: 0.92; transform: translate(-50%, -50%) scale(1.08); } }
-    @keyframes story-dealer { from { opacity: 0; transform: translate(-50%, -64%) scale(0.7); } to { opacity: 0.8; transform: translate(-50%, -50%) scale(0.92); } }
-    @keyframes story-fly-left { from { opacity: 0; transform: translate(-48vw, 18vh) rotate(-42deg) scale(0.5); } to { opacity: 0.86; transform: rotate(-18deg) scale(1); } }
-    @keyframes story-fly-right { from { opacity: 0; transform: translate(46vw, -12vh) rotate(38deg) scale(0.5); } to { opacity: 0.86; transform: rotate(14deg) scale(1); } }
-    @keyframes story-card-zoom { from { opacity: 0; transform: translate(-50%, -50%) rotate(-16deg) scale(0.48); } to { opacity: 0.9; transform: translate(-50%, -50%) rotate(3deg) scale(1.2); } }
-    @keyframes story-heart-pop { from { opacity: 0; transform: translateX(-50%) scale(0.55); } to { opacity: 1; transform: translateX(-50%) scale(1); } }
-    @keyframes story-text-in { from { opacity: 0; transform: translateY(18px) scale(0.98); } to { opacity: 1; transform: translateY(0) scale(1); } }
-    @keyframes story-shake { 0%, 100% { transform: translateX(0); } 20% { transform: translateX(-5px); } 40% { transform: translateX(4px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
+    @keyframes story-image-enter { from { opacity: 0; transform: translateX(5vw) scale(0.985); } to { opacity: 1; transform: translateX(0) scale(1); } }
+    @keyframes story-image-focus { from { transform: scale(1.035); filter: brightness(0.72) contrast(1.14); } to { transform: scale(1); filter: brightness(1) contrast(1); } }
 
     .controls {
       position: sticky;
@@ -1376,6 +1326,13 @@
     </header>
 
     <section class="table">
+      <div class="table-grime" aria-hidden="true">
+        <span class="blood-smear one"></span>
+        <span class="blood-smear two"></span>
+        <span class="blood-smear three"></span>
+        <span class="scratch-mark one"></span>
+        <span class="scratch-mark two"></span>
+      </div>
       <section class="zone" id="dealer-zone" aria-labelledby="dealer-title">
         <div class="zone-header">
           <div class="zone-title" id="dealer-title"><span class="avatar dealer-avatar">☠</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span></div>
@@ -1388,7 +1345,7 @@
       <section class="center-panel" aria-live="polite">
         <div>
           <p class="message" id="message">点击“发牌”开始第一局</p>
-          <p class="hint" id="hint">自己回合可切换【技能牌】查看或使用</p>
+          <p class="hint" id="hint">发牌后可切换【技能牌】查看或使用</p>
           <button class="rule-button" id="rule-button" type="button" hidden>规则</button>
         </div>
       </section>
@@ -1412,29 +1369,20 @@
       <button id="stand-button" class="secondary" disabled>结束</button>
     </nav>
 
-    <div class="story-modal" id="story-modal" role="dialog" hidden aria-modal="true" aria-labelledby="story-title">
-      <div class="story-panel" id="story-panel">
+    <div class="story-modal" id="story-modal" role="dialog" hidden aria-modal="true" aria-label="剧情序章">
+      <header class="story-topbar">
+        <span class="story-counter" id="story-counter">第 1 幕 / 共 5 幕</span>
         <button class="story-skip" id="story-skip" type="button">跳过</button>
-        <section class="story-stage" aria-live="polite">
-          <div class="story-visual" aria-hidden="true">
-            <div class="story-orb"></div>
-            <div class="story-dealer-shadow"></div>
-            <div class="story-card-ghost one"></div>
-            <div class="story-card-ghost two"></div>
-            <div class="story-card-back"></div>
-            <div class="story-hearts"><span>❤</span><span>❤</span><span>❤</span></div>
-          </div>
-          <article class="story-content">
-            <div class="story-kicker" id="story-kicker">序章</div>
-            <h2 class="story-title" id="story-title">醒不过来的赌局</h2>
-            <p class="story-text" id="story-text"></p>
-          </article>
-        </section>
-        <footer class="story-footer">
-          <div class="story-progress" id="story-progress" aria-label="剧情进度"></div>
-          <button class="story-next" id="story-next" type="button">下一幕</button>
-        </footer>
-      </div>
+      </header>
+      <section class="story-stage" aria-live="polite">
+        <div class="story-frame" id="story-panel">
+          <img class="story-image" id="story-image" alt="剧情序章第1幕" draggable="false">
+        </div>
+      </section>
+      <footer class="story-footer">
+        <div class="story-progress" id="story-progress" aria-label="剧情进度"></div>
+        <button class="story-next" id="story-next" type="button">下一幕</button>
+      </footer>
     </div>
 
     <div class="rules-modal" id="rules-modal" role="dialog" hidden aria-modal="true" aria-labelledby="rules-title">
@@ -1525,11 +1473,10 @@
       rulesClose: document.querySelector("#rules-close"),
       storyModal: document.querySelector("#story-modal"),
       storyPanel: document.querySelector("#story-panel"),
+      storyImage: document.querySelector("#story-image"),
+      storyCounter: document.querySelector("#story-counter"),
       storySkip: document.querySelector("#story-skip"),
       storyNext: document.querySelector("#story-next"),
-      storyKicker: document.querySelector("#story-kicker"),
-      storyTitle: document.querySelector("#story-title"),
-      storyText: document.querySelector("#story-text"),
       storyProgress: document.querySelector("#story-progress"),
       dealButton: document.querySelector("#deal-button"),
       hitButton: document.querySelector("#hit-button"),
@@ -1540,28 +1487,13 @@
       dealerZone: document.querySelector("#dealer-zone"),
     };
 
-    const storyScenes = [
-      {
-        title: "醒不过来的赌局",
-        text: "我又做了那个梦。\n梦里没有门，没有窗，只有一张绿色的牌桌。\n桌子的另一端，坐着一个我永远看不清脸的人。",
-      },
-      {
-        title: "反复失败",
-        text: "我已经记不清输过多少次。\n每一次，它都会把牌推到我面前。\n每一次，我都以为自己快要醒了。",
-      },
-      {
-        title: "三颗心",
-        text: "可是每输一局，胸口就像被挖走一块。\n那三颗心，不是筹码。\n是我还能留在这里的次数。",
-      },
-      {
-        title: "庄家的低语",
-        text: "“继续。”\n它的声音从桌子对面传来。\n“只要赢下这场游戏，你就能醒来。”",
-      },
-      {
-        title: "没有退路",
-        text: "我不知道它是不是在说谎。\n但这一次，我没有退路。\n如果梦有出口——\n那一定藏在这场 致命21点 里。",
-      },
-    ];
+    const storyScenes = Array.from({ length: 5 }, (_, index) => {
+      const sceneNumber = index + 1;
+      return {
+        label: `剧情序章第${sceneNumber}幕`,
+        imageCandidates: imageExtensions.map(extension => `img/story-${sceneNumber}.${extension}`),
+      };
+    });
     let storyIndex = 0;
 
     elements.dealButton.addEventListener("click", startRound);
@@ -1650,6 +1582,7 @@
       [
         ...createDeck().flatMap(card => card.imageCandidates.slice(0, 4)),
         ...createSkillDeck().flatMap(card => card.imageCandidates.slice(0, 4)),
+        ...storyScenes.flatMap(scene => scene.imageCandidates.slice(0, 4)),
         ...numberBackImageCandidates,
         ...skillBackImageCandidates,
       ].forEach(src => {
@@ -1731,7 +1664,7 @@
       resetTurnFlags();
       state.playerEndedCleanly = false;
       state.dealerEndedCleanly = false;
-      setMessage("发牌中", "自己回合可切换【技能牌】查看或使用", true);
+      setMessage("发牌中", "发牌后可切换【技能牌】查看或使用", true);
       render();
 
       const initialDeal = [
@@ -2312,7 +2245,7 @@
       state.skillDeck = [];
       state.playerView = "numbers";
       resetEffects();
-      setMessage("新的一场开始", "自己回合可切换【技能牌】查看或使用", true);
+      setMessage("新的一场开始", "发牌后可切换【技能牌】查看或使用", true);
     }
 
     function openStoryModal() {
@@ -2340,10 +2273,10 @@
 
     function updateStoryScene() {
       const scene = storyScenes[storyIndex];
-      elements.storyPanel.className = `story-panel story-scene-${storyIndex + 1}`;
-      elements.storyKicker.textContent = `序章 ${storyIndex + 1} / ${storyScenes.length}`;
-      elements.storyTitle.textContent = scene.title;
-      elements.storyText.textContent = scene.text;
+      elements.storyPanel.className = "story-frame";
+      elements.storyImage.alt = scene.label;
+      setResilientImage(elements.storyImage, scene.imageCandidates, scene.label);
+      elements.storyCounter.textContent = `第 ${storyIndex + 1} 幕 / 共 ${storyScenes.length} 幕`;
       elements.storyNext.textContent = storyIndex === storyScenes.length - 1 ? "开始赌局" : "下一幕";
       elements.storyProgress.innerHTML = "";
       storyScenes.forEach((_, index) => {
