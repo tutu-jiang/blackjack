@@ -427,8 +427,8 @@
 
     .skill-count {
       position: absolute;
-      left: 56px;
-      top: 42px;
+      left: 50px;
+      top: 34px;
       z-index: 4;
       min-height: 22px;
       display: inline-flex;
@@ -1311,6 +1311,14 @@
       46% { opacity: 1; transform: translate(calc(-50vw - 18px), 0) rotate(-8deg) scale(1.06); }
       72% { opacity: 1; transform: translate(calc(-50vw - 34px), var(--target-y)) rotate(4deg) scale(1); }
       100% { opacity: 1; transform: translate(calc(-50vw - 48px), var(--target-y)) rotate(0deg) scale(0.92); }
+    }
+
+
+    @media (min-width: 520px) {
+      .table { flex: 0 0 auto; min-height: 0; padding-bottom: 8px; }
+      .zone { min-height: 0; }
+      .zone + .zone { margin-top: 8px; }
+      .cards { min-height: 156px; }
     }
 
     @media (max-width: 430px) {
