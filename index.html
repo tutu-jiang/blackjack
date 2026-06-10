@@ -1111,6 +1111,10 @@
       text-shadow: 0 2px 0 rgba(0,0,0,0.62), 0 0 10px rgba(255,48,61,0.36);
     }
 
+    .showcase-stack.ash-out { animation: ash-out 900ms ease-in both; }
+
+    .showcase-card.hold-showcase { animation: inspect-card 220ms ease-out both; }
+
     .showcase-card,
     .inspect-overlay img {
       width: min(68vw, 360px);
@@ -1260,6 +1264,14 @@
       backdrop-filter: blur(5px);
       pointer-events: none;
     }
+
+    .skill-showcase-stack {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+    }
+
+    .skill-showcase-stack.ash-out { animation: ash-out 900ms ease-in both; }
 
     .skill-showcase-card {
       width: min(76vw, 390px);
@@ -2045,7 +2057,7 @@
       addRecord(owner, owner === "dealer" ? `${actor}50%概率抽到1张技能牌` : `${actor}50%概率抽到1张技能牌“${card.name}”`);
       if (owner === "player") {
         setMessage("获得技能牌", "你获得了1张随机技能牌。", true);
-        await showcaseCard(card, { alt: `获得技能牌${card.name}`, caption: "你获得一张技能牌" });
+        await showcaseCard(card, { alt: `获得技能牌${card.name}`, caption: "你获得一张技能牌", holdMs: 4000 });
       } else {
         setMessage("庄家获得1张技能牌", "庄家把新技能牌加入手牌，具体内容仍然保密。", true);
         await wait(900);
@@ -2164,23 +2176,26 @@
     async function showSkillCard(owner, skill) {
       return new Promise(resolve => {
         const overlay = document.createElement("div");
+        const stack = document.createElement("div");
+        const caption = document.createElement("div");
         const card = document.createElement("div");
         const img = document.createElement("img");
         const name = document.createElement("div");
-        const caption = document.createElement("div");
         overlay.className = "skill-showcase";
+        stack.className = "skill-showcase-stack";
+        caption.className = "showcase-caption";
         card.className = "skill-showcase-card";
         name.className = "skill-showcase-name";
-        caption.className = "skill-showcase-caption";
-        name.textContent = skill.name;
         caption.textContent = `${ownerName(owner)}发动了技能牌`;
+        name.textContent = skill.name;
         img.alt = skill.name;
         setResilientImage(img, skill.imageCandidates, skill.name);
-        card.append(img, name, caption);
-        overlay.appendChild(card);
+        card.append(img, name);
+        stack.append(caption, card);
+        overlay.appendChild(stack);
         document.body.appendChild(overlay);
-        const holdMs = owner === "dealer" ? 5000 : 2000;
-        setTimeout(() => card.classList.add("ash-out"), holdMs);
+        const holdMs = 4000;
+        setTimeout(() => stack.classList.add("ash-out"), holdMs);
         setTimeout(() => {
           overlay.remove();
           resolve();
@@ -3031,6 +3046,7 @@
         overlay.className = "draw-showcase";
         stack.className = "showcase-stack";
         showcase.className = "showcase-card";
+        if (options.holdMs) showcase.classList.add("hold-showcase");
         caption.className = "showcase-caption";
         caption.textContent = options.caption || "";
         caption.hidden = !options.caption;
@@ -3054,8 +3070,13 @@
           overlay.remove();
           resolve();
         };
-        showcase.addEventListener("animationend", cleanup, { once: true });
-        setTimeout(cleanup, 1500);
+        if (options.holdMs) {
+          setTimeout(() => stack.classList.add("ash-out"), options.holdMs);
+          setTimeout(cleanup, options.holdMs + 900);
+        } else {
+          showcase.addEventListener("animationend", cleanup, { once: true });
+          setTimeout(cleanup, 1500);
+        }
       });
     }
 
