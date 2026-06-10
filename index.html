@@ -655,9 +655,11 @@
     .message {
       margin: 0;
       min-width: 0;
-      font-size: clamp(18px, 5vw, 25px);
+      font-size: clamp(14px, 4vw, 24px);
+      line-height: 1.15;
       font-weight: 900;
       color: var(--gold);
+      white-space: nowrap;
     }
 
     .message.typing::after {
@@ -1088,6 +1090,25 @@
       background: rgba(0, 0, 0, 0.58);
       backdrop-filter: blur(4px);
       pointer-events: none;
+    }
+
+    .showcase-stack {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+    }
+
+    .showcase-caption {
+      padding: 7px 16px;
+      border-radius: 999px;
+      color: #fff4d8;
+      background: rgba(28, 3, 5, 0.78);
+      border: 1px solid rgba(255, 48, 61, 0.46);
+      box-shadow: 0 0 18px rgba(255, 48, 61, 0.18), inset 0 0 14px rgba(255, 48, 61, 0.08);
+      font-size: clamp(17px, 5vw, 24px);
+      font-weight: 1000;
+      letter-spacing: 0.08em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.62), 0 0 10px rgba(255,48,61,0.36);
     }
 
     .showcase-card,
@@ -2024,7 +2045,7 @@
       addRecord(owner, owner === "dealer" ? `${actor}50%概率抽到1张技能牌` : `${actor}50%概率抽到1张技能牌“${card.name}”`);
       if (owner === "player") {
         setMessage("获得技能牌", "你获得了1张随机技能牌。", true);
-        await showcaseCard(card, { alt: `获得技能牌${card.name}` });
+        await showcaseCard(card, { alt: `获得技能牌${card.name}`, caption: "你获得一张技能牌" });
       } else {
         setMessage("庄家获得1张技能牌", "庄家把新技能牌加入手牌，具体内容仍然保密。", true);
         await wait(900);
@@ -3001,12 +3022,18 @@
     function showcaseCard(card, options = {}) {
       return new Promise(resolve => {
         const overlay = document.createElement("div");
+        const stack = document.createElement("div");
+        const caption = document.createElement("div");
         const showcase = document.createElement("div");
         const front = document.createElement("img");
         const back = document.createElement("img");
         const alt = options.alt || `抽到${card.label}`;
         overlay.className = "draw-showcase";
+        stack.className = "showcase-stack";
         showcase.className = "showcase-card";
+        caption.className = "showcase-caption";
+        caption.textContent = options.caption || "";
+        caption.hidden = !options.caption;
         front.alt = alt;
         back.alt = "";
         front.draggable = false;
@@ -3016,7 +3043,8 @@
         setResilientImage(front, frontCandidates, alt);
         setResilientImage(back, numberBackImageCandidates, "数字牌背面");
         showcase.append(front, back);
-        overlay.appendChild(showcase);
+        stack.append(caption, showcase);
+        overlay.appendChild(stack);
         document.body.appendChild(overlay);
 
         let done = false;
