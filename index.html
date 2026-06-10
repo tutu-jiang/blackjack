@@ -800,6 +800,63 @@
 
 
 
+
+
+    .record-dialog { padding-bottom: 24px; }
+
+    .record-body {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+      color: #dfd4c4;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .record-empty {
+      margin: 0;
+      padding: 14px;
+      border-radius: 16px;
+      color: rgba(248,234,212,0.76);
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .record-round {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.09);
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.18);
+    }
+
+    .record-round h3,
+    .record-round h4 {
+      margin: 0 0 8px;
+      color: #fff6d0;
+      font-size: 17px;
+    }
+
+    .record-round h4 {
+      margin-top: 12px;
+      color: rgba(255,107,107,0.9);
+      font-size: 15px;
+    }
+
+    .record-round ol {
+      margin: 6px 0 0;
+      padding-left: 1.25em;
+    }
+
+    .record-round li { margin: 5px 0; }
+
+    .record-line-title {
+      color: #fff1d0;
+      font-weight: 1000;
+    }
+
+
     .story-modal[hidden] { display: none; }
 
     body.story-open { overflow: hidden; }
@@ -1387,7 +1444,7 @@
 
 
     @media (min-width: 520px) {
-      .table { flex: 0 0 auto; min-height: 0; padding-bottom: 8px; }
+      .table { flex: 0 0 auto; min-height: 640px; padding-bottom: 8px; }
       .zone { min-height: 0; }
       .zone + .zone { margin-top: 8px; }
       .cards { min-height: 156px; }
@@ -1429,6 +1486,7 @@
         <h1>致命<span class="title-accent">21点</span></h1>
       </div>
       <div class="header-actions">
+        <button class="rule-button" id="record-button" type="button" hidden>记录</button>
         <button class="rule-button" id="rule-button" type="button" hidden>规则</button>
         <div class="developer">开发者：兔兔酱</div>
       </div>
@@ -1491,6 +1549,17 @@
         <div class="story-progress" id="story-progress" aria-label="剧情进度"></div>
         <button class="story-next" id="story-next" type="button">下一幕</button>
       </footer>
+    </div>
+
+    <div class="rules-modal" id="record-modal" role="dialog" hidden aria-modal="true" aria-labelledby="record-title">
+      <div class="rules-dialog record-dialog">
+        <button class="rules-close" id="record-close" type="button" aria-label="关闭操作记录">×</button>
+        <div class="rules-kicker">整局操作记录</div>
+        <h2 id="record-title">游戏记录</h2>
+        <div class="record-body" id="record-body">
+          <p class="record-empty">大局开始后，这里会记录双方发牌、抽牌、技能牌和结束回合。</p>
+        </div>
+      </div>
     </div>
 
     <div class="rules-modal" id="rules-modal" role="dialog" hidden aria-modal="true" aria-labelledby="rules-title">
@@ -1563,6 +1632,9 @@
         player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
         dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
       },
+      matchLog: [],
+      currentRoundLog: null,
+      currentTurnLog: null,
     };
 
     const renderCache = {
@@ -1586,6 +1658,10 @@
       playerScore: document.querySelector("#player-score"),
       message: document.querySelector("#message"),
       hint: document.querySelector("#hint"),
+      recordButton: document.querySelector("#record-button"),
+      recordModal: document.querySelector("#record-modal"),
+      recordClose: document.querySelector("#record-close"),
+      recordBody: document.querySelector("#record-body"),
       ruleButton: document.querySelector("#rule-button"),
       rulesModal: document.querySelector("#rules-modal"),
       rulesClose: document.querySelector("#rules-close"),
@@ -1619,6 +1695,11 @@
     elements.standButton.addEventListener("click", endPlayerTurn);
     elements.storyNext.addEventListener("click", nextStoryScene);
     elements.storySkip.addEventListener("click", finishStoryIntro);
+    elements.recordButton.addEventListener("click", () => openRecordModal());
+    elements.recordClose.addEventListener("click", () => closeRecordModal());
+    elements.recordModal.addEventListener("click", event => {
+      if (event.target === elements.recordModal) closeRecordModal();
+    });
     elements.ruleButton.addEventListener("click", () => openRulesModal());
     elements.rulesClose.addEventListener("click", () => closeRulesModal());
     elements.rulesModal.addEventListener("click", event => {
@@ -1626,6 +1707,7 @@
     });
     document.addEventListener("keydown", event => {
       if (event.key === "Escape" && !elements.storyModal.hidden) finishStoryIntro();
+      else if (event.key === "Escape" && !elements.recordModal.hidden) closeRecordModal();
       else if (event.key === "Escape" && !elements.rulesModal.hidden) closeRulesModal();
       else if ((event.key === "Enter" || event.key === " ") && !elements.storyModal.hidden) {
         event.preventDefault();
@@ -1798,12 +1880,14 @@
         render();
         await wait(150);
       }
+      startRoundLog(initialDeal);
 
       state.roundActive = true;
       state.animating = false;
       state.effects.dealer.blockSkills = false;
       state.turn = "player";
       resetTurnFlags();
+      startTurnLog();
       await maybeGrantTurnSkill("player");
       setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽1张数字牌，也可以随时发动技能牌；点击“结束”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
 
@@ -1828,6 +1912,7 @@
       }
       await dealCardToTable(card, false, "player");
       await resolveDrawnNumberCard("player", card);
+      addRecord("player", `玩家选择“要牌”，抽到数字牌“${card.rank}”`);
       state.playerDrewThisTurn = true;
       state.playerEndedCleanly = false;
       state.animating = false;
@@ -1841,6 +1926,7 @@
       state.animating = true;
       state.turn = "dealer";
       state.playerEndedCleanly = !state.playerDrewThisTurn;
+      addRecord("player", "玩家选择“结束”");
       state.effects.player.blockSkills = false;
       render();
       if (settleIfNumberDeckEmpty()) return;
@@ -1853,6 +1939,7 @@
 
       if (handValue(state.dealer).total >= 21) {
         await showDealerDecision("庄家选择停牌");
+        addRecord("dealer", "庄家选择“结束”");
         state.dealerEndedCleanly = true;
       } else {
         await maybeGrantTurnSkill("dealer");
@@ -1870,11 +1957,13 @@
           await showDealerDecision("庄家选择要牌");
           await dealCardToTable(card, true, "dealer");
           await resolveDrawnNumberCard("dealer", card);
+          addRecord("dealer", `庄家选择“要牌”，抽到数字牌“${card.rank}”`);
           state.dealerDrewThisTurn = true;
           state.dealerEndedCleanly = false;
           render();
         } else {
           await showDealerDecision("庄家选择停牌");
+          addRecord("dealer", "庄家选择“结束”");
           state.dealerEndedCleanly = true;
         }
       }
@@ -1891,6 +1980,7 @@
       state.effects.dealer.blockSkills = false;
       state.turn = "player";
       resetTurnFlags();
+      startTurnLog();
       await maybeGrantTurnSkill("player");
       state.animating = false;
       setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽1张数字牌，也可以随时发动技能牌；点击“结束”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
@@ -1910,8 +2000,17 @@
     }
 
     async function maybeGrantTurnSkill(owner) {
-      if (!state.skillDeck.length || secureRandomInt(100) >= turnSkillDrawChance * 100) return;
+      const actor = ownerName(owner);
+      if (!state.skillDeck.length) {
+        addRecord(owner, `${actor}50%概率未抽到技能牌（技能牌堆已空）`);
+        return;
+      }
+      if (secureRandomInt(100) >= turnSkillDrawChance * 100) {
+        addRecord(owner, `${actor}50%概率未抽到技能牌`);
+        return;
+      }
       const card = state.skillDeck.pop();
+      addRecord(owner, `${actor}50%概率抽到1张技能牌“${card.name}”`);
       if (owner === "player") {
         setMessage("获得技能牌", "你获得了1张随机技能牌。", true);
         await showcaseCard(card, { alt: `获得技能牌${card.name}` });
@@ -1963,10 +2062,12 @@
       if (state.effects[owner].counterSkill) {
         state.effects[owner].counterSkill = false;
         setMessage("技能牌失效", `【${skill.name}】技能牌发动失效。`, true);
+        addRecord(owner, `${ownerName(owner)}发动技能牌“${skill.name}”，因识破效果发动失效`);
         await wait(1500);
         return;
       }
       await showSkillCard(owner, skill);
+      addRecord(owner, `${ownerName(owner)}发动技能牌“${skill.name}”`);
       switch (skill.id) {
         case "peek":
           await revealOpponentHole(owner, opponent);
@@ -2154,6 +2255,7 @@
       }
       const chosen = owner === "player" ? candidates[0] : candidates[secureRandomInt(candidates.length)];
       hand.splice(chosen.index, 1);
+      addRecord(owner, `${ownerName(owner)}因“改运”废弃数字牌“${chosen.card.rank}”`);
       setMessage("改运", `${ownerName(owner)}废弃了${chosen.card.label}，重新抽取1张数字牌。`, true);
       await wait(900);
       const newCard = drawNumberCardFor(owner);
@@ -2164,6 +2266,7 @@
       }
       await showcaseCard(newCard, { hidden: owner === "dealer", alt: `${ownerName(owner)}重新抽牌` });
       await resolveDrawnNumberCard(owner, newCard);
+      addRecord(owner, `${ownerName(owner)}因“改运”重新抽到数字牌“${newCard.rank}”`);
     }
 
     async function drawBestCard(owner) {
@@ -2184,6 +2287,7 @@
       setMessage("强运", `${ownerName(owner)}抽取了最有利的数字牌。`, true);
       await showcaseCard(card, { hidden: owner === "dealer", alt: `${ownerName(owner)}强运抽牌` });
       await resolveDrawnNumberCard(owner, card);
+      addRecord(owner, `${ownerName(owner)}因“强运”抽到数字牌“${card.rank}”`);
     }
 
     async function swapRandomVisibleCards() {
@@ -2197,6 +2301,8 @@
       const p = playerOptions[secureRandomInt(playerOptions.length)];
       const d = dealerOptions[secureRandomInt(dealerOptions.length)];
       setMessage("换牌", `双方交换了${p.card.label}与${d.card.label}。`, true);
+      addRecord("player", `双方因“换牌”交换了玩家数字牌“${p.card.rank}”和庄家数字牌“${d.card.rank}”`);
+      addRecord("dealer", `双方因“换牌”交换了玩家数字牌“${p.card.rank}”和庄家数字牌“${d.card.rank}”`);
       await animateSwapCards(p.card, d.card);
       [state.player[p.index], state.dealer[d.index]] = [d.card, p.card];
       render();
@@ -2246,6 +2352,7 @@
         effect.destroyNextDraw = false;
         await showDestroyedCard(card, { hidden: owner === "dealer", alt: `${ownerName(owner)}抽到的${card.label}被破坏` });
         setMessage("数字牌被破坏", `${ownerName(owner)}抽到的${card.label}被废弃。`, true);
+        addRecord(owner, `因对手技能牌“破坏”效果，数字牌“${card.rank}”被废弃`);
         await wait(1200);
         return;
       }
@@ -2253,6 +2360,7 @@
       if (effect.fateChange && handValue([...hand, card]).total > 21) {
         effect.fateChange = false;
         setMessage("改命生效", `${ownerName(owner)}抽到的${card.label}导致爆牌，已废弃。`, true);
+        addRecord(owner, `因技能牌“改命”效果，数字牌“${card.rank}”被废弃`);
         await wait(1000);
         return;
       }
@@ -2291,9 +2399,15 @@
       const playerTotal = handValue(state.player).total;
       const dealerTotal = handValue(state.dealer).total;
       const result = compareTotals(playerTotal, dealerTotal);
-      if (result > 0) finishRound("win", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，庄家扣1颗生命。`, false);
-      else if (result < 0) finishRound("lose", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，你扣1颗生命。`, false);
-      else finishRound("push", `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，平局，不扣生命。`, false);
+      const resultText = result > 0
+        ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，庄家扣1颗生命。`
+        : result < 0
+          ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，你扣1颗生命。`
+          : `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，平局，不扣生命。`;
+      addRoundResult(resultText);
+      if (result > 0) finishRound("win", resultText, false);
+      else if (result < 0) finishRound("lose", resultText, false);
+      else finishRound("push", resultText, false);
     }
 
     function dealerWantsCard() {
@@ -2375,6 +2489,7 @@
       state.deck = [];
       state.skillDeck = [];
       state.playerView = "numbers";
+      resetMatchLog();
       resetEffects();
       setMessage("新的一场开始", "发牌后可切换【技能牌】查看或使用", true);
     }
@@ -2415,6 +2530,117 @@
         dot.className = `story-dot${index === storyIndex ? " active" : ""}`;
         elements.storyProgress.appendChild(dot);
       });
+    }
+
+
+    function openRecordModal() {
+      renderRecordLog();
+      elements.recordModal.hidden = false;
+      document.body.classList.add("rules-open");
+      elements.recordClose.focus({ preventScroll: true });
+    }
+
+    function closeRecordModal() {
+      elements.recordModal.hidden = true;
+      document.body.classList.remove("rules-open");
+    }
+
+    function renderRecordLog() {
+      elements.recordBody.innerHTML = "";
+      if (!state.matchLog.length) {
+        const empty = document.createElement("p");
+        empty.className = "record-empty";
+        empty.textContent = "大局开始后，这里会记录双方发牌、抽牌、技能牌和结束回合。";
+        elements.recordBody.appendChild(empty);
+        return;
+      }
+      state.matchLog.forEach(round => {
+        const section = document.createElement("section");
+        section.className = "record-round";
+        section.appendChild(createRecordHeading("h3", `一、第${chineseNumber(round.number)}局`));
+        section.appendChild(createRecordHeading("h4", "1、发牌阶段"));
+        section.appendChild(createRecordList(round.deal));
+        round.turns.forEach(turn => {
+          section.appendChild(createRecordHeading("h4", `${turn.number + 1}、第${chineseNumber(turn.number)}回合`));
+          section.appendChild(createRecordList([
+            `玩家决策：${turn.player.length ? turn.player.join("，") : "玩家暂未操作。"}`,
+            `庄家决策：${turn.dealer.length ? turn.dealer.join("，") : "庄家暂未操作。"}`,
+          ]));
+        });
+        if (round.result) {
+          section.appendChild(createRecordHeading("h4", "结算"));
+          section.appendChild(createRecordList([round.result]));
+        }
+        elements.recordBody.appendChild(section);
+      });
+    }
+
+    function createRecordHeading(tag, text) {
+      const heading = document.createElement(tag);
+      heading.textContent = text;
+      return heading;
+    }
+
+    function createRecordList(items) {
+      const list = document.createElement("ol");
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+      return list;
+    }
+
+    function resetMatchLog() {
+      state.matchLog = [];
+      state.currentRoundLog = null;
+      state.currentTurnLog = null;
+      if (elements.recordBody) renderRecordLog();
+    }
+
+    function startRoundLog(initialDeal) {
+      const playerCards = initialDeal.filter(item => item.owner === "player").map(item => item.card.label);
+      const dealerFirst = initialDeal.find(item => item.owner === "dealer" && !item.hidden)?.card.label || "一张明牌";
+      const round = {
+        number: state.matchLog.length + 1,
+        deal: [
+          `玩家摸到：数字牌“${playerCards[0]}”和“${playerCards[1]}”（己方盖牌）；技能牌${formatSkillNames(state.playerSkills)}。`,
+          `庄家摸到：数字牌“${dealerFirst}”和一张盖牌；${state.dealerSkills.length}张技能牌。`,
+        ],
+        turns: [],
+        result: "",
+      };
+      state.matchLog.push(round);
+      state.currentRoundLog = round;
+      state.currentTurnLog = null;
+    }
+
+    function startTurnLog() {
+      if (!state.currentRoundLog) return;
+      const turn = { number: state.currentRoundLog.turns.length + 1, player: [], dealer: [] };
+      state.currentRoundLog.turns.push(turn);
+      state.currentTurnLog = turn;
+    }
+
+    function addRecord(owner, text) {
+      if (!state.currentTurnLog) return;
+      state.currentTurnLog[owner].push(text);
+      if (!elements.recordModal.hidden) renderRecordLog();
+    }
+
+    function addRoundResult(text) {
+      if (!state.currentRoundLog) return;
+      state.currentRoundLog.result = text;
+      if (!elements.recordModal.hidden) renderRecordLog();
+    }
+
+    function formatSkillNames(skills) {
+      if (!skills.length) return "0张";
+      return skills.map(skill => `“${skill.name}”`).join("和");
+    }
+
+    function chineseNumber(value) {
+      return ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"][value] || String(value);
     }
 
     function openRulesModal() {
@@ -2489,6 +2715,8 @@
       elements.dealButton.disabled = state.roundActive || state.animating;
       elements.hitButton.disabled = !state.roundActive || state.animating || state.turn !== "player" || state.playerDrewThisTurn || state.deck.length === 0;
       elements.standButton.disabled = !state.roundActive || state.animating || state.turn !== "player";
+      elements.recordButton.hidden = !state.matchStarted;
+      elements.recordButton.disabled = state.animating;
       elements.ruleButton.hidden = !state.matchStarted;
       elements.ruleButton.disabled = state.animating;
 
