@@ -1628,9 +1628,10 @@
       playerHoleRevealed: false,
       dealerHoleRevealed: false,
       playerView: "numbers",
+      targetScore: 21,
       effects: {
-        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
-        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
       },
       matchLog: [],
       currentRoundLog: null,
@@ -1760,6 +1761,9 @@
         ["seeThrough", "识破", "对方下次发动技能牌失效。"],
         ["destroy", "破坏", "下次对手抽取的数字牌直接废弃。"],
         ["gift", "赠品", "对手下次抽牌优先抽到8。"],
+        ["godHand", "神之一手", "下次自己摸牌一定摸到数字牌1。"],
+        ["deadly28", "致命28点", "本小局改为接近28点者获胜。"],
+        ["force", "强势", "下个回合，对方必须选择要牌。"],
       ].map(([id, name, effect]) => ({
         id,
         name,
@@ -1860,6 +1864,7 @@
       state.playerHoleRevealed = false;
       state.dealerHoleRevealed = false;
       state.playerView = "numbers";
+      state.targetScore = 21;
       resetEffects();
       resetTurnFlags();
       state.playerEndedCleanly = false;
@@ -1913,6 +1918,7 @@
       await dealCardToTable(card, false, "player");
       await resolveDrawnNumberCard("player", card);
       addRecord("player", `玩家选择“要牌”，抽到数字牌“${card.rank}”`);
+      state.effects.player.mustHit = false;
       state.playerDrewThisTurn = true;
       state.playerEndedCleanly = false;
       state.animating = false;
@@ -1923,6 +1929,11 @@
 
     async function endPlayerTurn() {
       if (!state.roundActive || state.animating || state.turn !== "player") return;
+      if (state.effects.player.mustHit && !state.playerDrewThisTurn && state.deck.length > 0) {
+        setMessage("强势压制", "你必须先选择“要牌”，才能点击“结束”。", true);
+        addRecord("player", "因技能牌“强势”效果，玩家本回合必须先要牌");
+        return;
+      }
       state.animating = true;
       state.turn = "dealer";
       state.playerEndedCleanly = !state.playerDrewThisTurn;
@@ -1938,18 +1949,18 @@
       state.dealerSkillDrawnThisTurn = false;
       state.dealerEndedCleanly = false;
 
-      if (handValue(state.dealer).total >= 21) {
+      if (!state.effects.dealer.mustHit && handValue(state.dealer).total >= state.targetScore) {
         await showDealerDecision("庄家选择停牌");
         addRecord("dealer", "庄家选择“结束”");
         state.dealerEndedCleanly = true;
       } else {
         await maybeGrantTurnSkill("dealer");
-        if (handValue(state.dealer).total < 21) await maybeDealerUseSkill();
+        if (handValue(state.dealer).total < state.targetScore) await maybeDealerUseSkill();
         if (settleIfNumberDeckEmpty()) return;
       }
 
       if (!state.dealerEndedCleanly) {
-        if (dealerWantsCard()) {
+        if (state.effects.dealer.mustHit || dealerWantsCard()) {
           const card = drawNumberCardFor("dealer");
           if (!card) {
             settleIfNumberDeckEmpty();
@@ -1959,6 +1970,7 @@
           await dealCardToTable(card, true, "dealer");
           await resolveDrawnNumberCard("dealer", card);
           addRecord("dealer", `庄家选择“要牌”，抽到数字牌“${card.rank}”`);
+          state.effects.dealer.mustHit = false;
           state.dealerDrewThisTurn = true;
           state.dealerEndedCleanly = false;
           render();
@@ -1989,8 +2001,8 @@
 
     function resetEffects() {
       state.effects = {
-        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
-        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null },
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
       };
     }
 
@@ -2048,7 +2060,7 @@
     }
 
     function chooseDealerSkillIndex() {
-      const preferred = ["lucky", "peek", "destroy", "gift", "noCheat", "fate", "swap"];
+      const preferred = ["deadly28", "lucky", "godHand", "force", "peek", "destroy", "gift", "noCheat", "fate", "swap"];
       for (const id of preferred) {
         const index = state.dealerSkills.findIndex(card => card.id === id);
         if (index >= 0) return index;
@@ -2060,8 +2072,8 @@
       const opponent = owner === "player" ? "dealer" : "player";
       if (state.effects[owner].counterSkill) {
         state.effects[owner].counterSkill = false;
-        setMessage("技能牌失效", `【${skill.name}】技能牌发动失效。`, true);
-        addRecord(owner, `${ownerName(owner)}发动技能牌“${skill.name}”，因识破效果发动失效`);
+        setMessage(`${skill.name}发动失败`, `因“识破”效果，【${skill.name}】技能牌发动失败。`, true);
+        addRecord(owner, `${ownerName(owner)}发动技能牌“${skill.name}”，因识破效果发动失败`);
         await wait(1500);
         return;
       }
@@ -2105,6 +2117,19 @@
           break;
         case "gift":
           await setForcedRank(opponent, "8", "赠品");
+          break;
+        case "godHand":
+          await setForcedRank(owner, "1", "神之一手", `${ownerName(owner)}下次抽牌将摸到数字牌1。`);
+          break;
+        case "deadly28":
+          state.targetScore = 28;
+          setMessage("致命28点", "本小局改为接近28点者获胜，超过28点视为爆牌。", true);
+          addRecord(owner, `${ownerName(owner)}发动“致命28点”成功，本小局目标点数改为28点`);
+          break;
+        case "force":
+          state.effects[opponent].mustHit = true;
+          setMessage("强势", `${ownerName(opponent)}下个回合必须先选择“要牌”。`, true);
+          addRecord(owner, `${ownerName(opponent)}下个回合必须先选择“要牌”`);
           break;
       }
       render();
@@ -2275,7 +2300,8 @@
       state.deck.forEach((card, index) => {
         const value = cardValueForBust(card);
         const after = total + value;
-        const score = after <= 21 ? 21 - after : after - 21 + 30;
+        const target = state.targetScore;
+        const score = after <= target ? target - after : after - target + 30;
         if (score < bestScore) {
           bestScore = score;
           bestIndex = index;
@@ -2335,12 +2361,14 @@
       });
     }
 
-    async function setForcedRank(owner, rank, skillName) {
+    async function setForcedRank(owner, rank, skillName, successText = "") {
       if (state.deck.some(card => card.rank === rank)) {
         state.effects[owner].forceRank = rank;
-        setMessage(skillName, `${ownerName(owner)}下次抽牌将优先抽到${rank}。`, true);
+        setMessage(skillName, successText || `${ownerName(owner)}下次抽牌将优先抽到${rank}。`, true);
+        addRecord(owner, `${skillName}生效，${ownerName(owner)}下次抽牌优先抽到数字牌“${rank}”`);
       } else {
-        setMessage(`${skillName}发动失效`, `牌堆中已经没有${rank}。`, true);
+        setMessage(`${skillName}发动失败`, `${skillName}发动失败`, true);
+        addRecord(owner, `${skillName}发动失败，数字牌“${rank}”已不在牌堆中`);
       }
       await wait(1200);
     }
@@ -2356,9 +2384,9 @@
         return;
       }
       const hand = state[owner];
-      if (effect.fateChange && handValue([...hand, card]).total > 21) {
+      if (effect.fateChange && handValue([...hand, card]).total > state.targetScore) {
         effect.fateChange = false;
-        setMessage("改命生效", `${ownerName(owner)}抽到的${card.label}导致爆牌，已废弃。`, true);
+        setMessage("改命生效", `${ownerName(owner)}抽到的${card.label}超过${state.targetScore}点导致爆牌，已废弃。`, true);
         addRecord(owner, `因技能牌“改命”效果，数字牌“${card.rank}”被废弃`);
         await wait(1000);
         return;
@@ -2368,12 +2396,13 @@
     }
 
     function compareTotals(playerTotal, dealerTotal) {
-      const playerBust = playerTotal > 21;
-      const dealerBust = dealerTotal > 21;
+      const target = state.targetScore;
+      const playerBust = playerTotal > target;
+      const dealerBust = dealerTotal > target;
       if (!playerBust && dealerBust) return 1;
       if (playerBust && !dealerBust) return -1;
-      if (playerBust && dealerBust) return dealerTotal - playerTotal;
-      return playerTotal - dealerTotal;
+      if (playerBust && dealerBust) return Math.abs(dealerTotal - target) - Math.abs(playerTotal - target);
+      return Math.abs(dealerTotal - target) - Math.abs(playerTotal - target);
     }
 
     function resetTurnFlags() {
@@ -2408,11 +2437,12 @@
       const playerTotal = handValue(state.player).total;
       const dealerTotal = handValue(state.dealer).total;
       const result = compareTotals(playerTotal, dealerTotal);
+      const targetHint = state.targetScore === 28 ? "（致命28点规则）" : "";
       const resultText = result > 0
-        ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，庄家扣1颗生命。`
+        ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，${targetHint}庄家扣1颗生命。`
         : result < 0
-          ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，你扣1颗生命。`
-          : `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，平局，不扣生命。`;
+          ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，${targetHint}你扣1颗生命。`
+          : `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，${targetHint}平局，不扣生命。`;
       addRoundResult(resultText);
       if (result > 0) finishRound("win", resultText, false);
       else if (result < 0) finishRound("lose", resultText, false);
@@ -2422,12 +2452,13 @@
     function dealerWantsCard() {
       const dealerTotal = handValue(state.dealer).total;
       const playerTotal = handValue(state.player).total;
-      if (dealerTotal > 21 || dealerTotal >= playerTotal) return false;
-      if (dealerTotal <= 11) return true;
+      const target = state.targetScore;
+      if (dealerTotal > target || Math.abs(dealerTotal - target) <= Math.abs(playerTotal - target)) return false;
+      if (dealerTotal <= Math.floor(target / 2)) return true;
 
-      const bustCards = state.deck.filter(card => dealerTotal + cardValueForBust(card) > 21).length;
+      const bustCards = state.deck.filter(card => dealerTotal + cardValueForBust(card) > target).length;
       const bustRisk = bustCards / Math.max(state.deck.length, 1);
-      const gap = playerTotal - dealerTotal;
+      const gap = Math.abs(dealerTotal - target) - Math.abs(playerTotal - target);
       return gap >= 4 || bustRisk < 0.42;
     }
 
@@ -2498,6 +2529,7 @@
       state.deck = [];
       state.skillDeck = [];
       state.playerView = "numbers";
+      state.targetScore = 21;
       resetMatchLog();
       resetEffects();
       setMessage("新的一场开始", "发牌后可切换【技能牌】查看或使用", true);
@@ -2723,7 +2755,7 @@
       elements.standButton.textContent = "结束";
       elements.dealButton.disabled = state.roundActive || state.animating;
       elements.hitButton.disabled = !state.roundActive || state.animating || state.turn !== "player" || state.playerDrewThisTurn || state.deck.length === 0;
-      elements.standButton.disabled = !state.roundActive || state.animating || state.turn !== "player";
+      elements.standButton.disabled = !state.roundActive || state.animating || state.turn !== "player" || (state.effects.player.mustHit && !state.playerDrewThisTurn && state.deck.length > 0);
       elements.recordButton.hidden = !state.matchStarted;
       elements.recordButton.disabled = state.animating;
       elements.ruleButton.hidden = !state.matchStarted;
