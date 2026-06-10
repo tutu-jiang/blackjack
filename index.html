@@ -1444,10 +1444,10 @@
 
 
     @media (min-width: 520px) {
-      .table { flex: 0 0 auto; min-height: 640px; padding-bottom: 8px; }
-      .zone { min-height: 0; }
+      .table { flex: 0 0 auto; min-height: 690px; padding-bottom: 8px; }
+      .zone { min-height: 222px; }
       .zone + .zone { margin-top: 8px; }
-      .cards { min-height: 156px; }
+      .cards { min-height: 178px; }
     }
 
     @media (max-width: 430px) {
@@ -1936,6 +1936,7 @@
     async function runDealerTurn() {
       state.dealerDrewThisTurn = false;
       state.dealerSkillDrawnThisTurn = false;
+      state.dealerEndedCleanly = false;
 
       if (handValue(state.dealer).total >= 21) {
         await showDealerDecision("庄家选择停牌");
@@ -1971,9 +1972,7 @@
       if (settleIfNumberDeckEmpty()) return;
 
       if (state.playerEndedCleanly && state.dealerEndedCleanly) {
-        compareHands();
-        state.animating = false;
-        render();
+        await startSettlementComparison();
         return;
       }
 
@@ -2010,7 +2009,7 @@
         return;
       }
       const card = state.skillDeck.pop();
-      addRecord(owner, `${actor}50%概率抽到1张技能牌“${card.name}”`);
+      addRecord(owner, owner === "dealer" ? `${actor}50%概率抽到1张技能牌` : `${actor}50%概率抽到1张技能牌“${card.name}”`);
       if (owner === "player") {
         setMessage("获得技能牌", "你获得了1张随机技能牌。", true);
         await showcaseCard(card, { alt: `获得技能牌${card.name}` });
@@ -2391,6 +2390,16 @@
       state.animating = false;
       render();
       return true;
+    }
+
+    async function startSettlementComparison() {
+      state.turn = "none";
+      setMessage("双方均已停牌，开始结算", "正在翻开隐藏牌并比较双方点数……", true);
+      render();
+      await wait(3000);
+      compareHands();
+      state.animating = false;
+      render();
     }
 
     function compareHands() {
