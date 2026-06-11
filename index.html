@@ -662,6 +662,12 @@
       white-space: nowrap;
     }
 
+    .message.win,
+    .message.lose {
+      white-space: normal;
+      font-size: clamp(17px, 4.5vw, 24px);
+    }
+
     .message.typing::after {
       content: "▌";
       display: inline-block;
@@ -676,6 +682,8 @@
       font-size: 13px;
       line-height: 1.35;
     }
+
+    .hint:empty { display: none; }
 
     .rule-button {
       min-width: 48px;
@@ -1927,7 +1935,7 @@
       resetTurnFlags();
       startTurnLog();
       await maybeGrantTurnSkill("player");
-      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽1张数字牌，也可以随时发动技能牌；点击“结束”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
+      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽数字牌也可以发动技能牌，点结束则切换庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
 
       render();
     }
@@ -2027,7 +2035,7 @@
       startTurnLog();
       await maybeGrantTurnSkill("player");
       state.animating = false;
-      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽1张数字牌，也可以随时发动技能牌；点击“结束”后切换至庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
+      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽数字牌也可以发动技能牌，点结束则切换庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
       render();
     }
 
@@ -2542,7 +2550,7 @@
         const finalText = state.dealerLives === 0 ? "整场胜利！庄家失去全部生命。" : "整场失败：你失去全部生命。";
         setMessage(finalText, `${text} 点击“重新开始”开启一场新的三命对决。`, false);
       } else {
-        setMessage(text, "点击“下一局”继续。双方生命会保留到整场游戏结束。", false);
+        setMessage(text, "", false);
       }
     }
 
