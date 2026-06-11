@@ -1671,8 +1671,8 @@
       playerView: "numbers",
       targetScore: 21,
       effects: {
-        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
-        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
       },
       matchLog: [],
       currentRoundLog: null,
@@ -1957,8 +1957,9 @@
         return;
       }
       await dealCardToTable(card, false, "player");
-      await resolveDrawnNumberCard("player", card);
       addRecord("player", `玩家选择“要牌”，抽到数字牌“${card.rank}”`);
+      flushForcedDrawFailure("player", card);
+      await resolveDrawnNumberCard("player", card);
       state.effects.player.mustHit = false;
       state.playerDrewThisTurn = true;
       state.playerEndedCleanly = false;
@@ -2004,17 +2005,22 @@
         if (state.effects.dealer.mustHit || dealerWantsCard()) {
           const card = drawNumberCardFor("dealer");
           if (!card) {
-            settleIfNumberDeckEmpty();
-            return;
-          }
+            await showDealerDecision("庄家选择停牌");
+            addRecord("dealer", "数字牌牌堆已空，庄家选择“结束”");
+            state.effects.dealer.mustHit = false;
+            state.dealerEndedCleanly = true;
+            render();
+          } else {
           await showDealerDecision("庄家选择要牌");
           await dealCardToTable(card, true, "dealer");
-          await resolveDrawnNumberCard("dealer", card);
           addRecord("dealer", `庄家选择“要牌”，抽到数字牌“${card.rank}”`);
+          flushForcedDrawFailure("dealer", card);
+          await resolveDrawnNumberCard("dealer", card);
           state.effects.dealer.mustHit = false;
           state.dealerDrewThisTurn = true;
           state.dealerEndedCleanly = false;
           render();
+          }
         } else {
           await showDealerDecision("庄家选择停牌");
           addRecord("dealer", "庄家选择“结束”");
@@ -2042,8 +2048,8 @@
 
     function resetEffects() {
       state.effects = {
-        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
-        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, mustHit: false },
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
       };
     }
 
@@ -2157,10 +2163,10 @@
           setMessage("破坏", `${ownerName(opponent)}下次抽取的数字牌会直接废弃。`, true);
           break;
         case "gift":
-          await setForcedRank(opponent, "8", "赠品");
+          await setForcedRank(opponent, "8", "赠品", "", owner);
           break;
         case "godHand":
-          await setForcedRank(owner, "1", "神之一手", `${ownerName(owner)}下次抽牌将摸到数字牌1。`);
+          await setForcedRank(owner, "1", "神之一手", `${ownerName(owner)}下次抽牌将摸到数字牌1。`, owner);
           break;
         case "deadly28":
           state.targetScore = 28;
@@ -2405,14 +2411,18 @@
       });
     }
 
-    async function setForcedRank(owner, rank, skillName, successText = "") {
+    async function setForcedRank(owner, rank, skillName, successText = "", sourceOwner = owner) {
+      const effect = state.effects[owner];
+      effect.forceRank = rank;
+      effect.forceSkillName = skillName;
+      effect.forceSourceName = ownerName(sourceOwner);
+      effect.forceFailureNote = "";
       if (state.deck.some(card => card.rank === rank)) {
-        state.effects[owner].forceRank = rank;
         setMessage(skillName, successText || `${ownerName(owner)}下次抽牌将优先抽到${rank}。`, true);
-        addRecord(owner, `${skillName}生效，${ownerName(owner)}下次抽牌优先抽到数字牌“${rank}”`);
+        addRecord(sourceOwner, `${skillName}生效，${ownerName(owner)}下次抽牌优先抽到数字牌“${rank}”`);
       } else {
-        setMessage(`${skillName}发动失败`, `${skillName}发动失败`, true);
-        addRecord(owner, `${skillName}发动失败，数字牌“${rank}”已不在牌堆中`);
+        setMessage(skillName, `${skillName}已发动；若目标数字牌不在牌堆中，下次抽牌时会发动失败。`, true);
+        addRecord(sourceOwner, `${skillName}已发动，等待${ownerName(owner)}下次抽牌时结算`);
       }
       await wait(1200);
     }
@@ -2458,11 +2468,10 @@
 
     function settleIfNumberDeckEmpty() {
       if (state.deck.length > 0 || !state.roundActive) return false;
-      setMessage("数字牌摸完", "牌堆里的11张数字牌已经全部出现，立即比较大小。", true);
-      compareHands();
+      setMessage("数字牌摸完", "牌堆里的11张数字牌已经全部出现；双方都结束且不再要牌后结算。", true);
       state.animating = false;
       render();
-      return true;
+      return false;
     }
 
     async function startSettlementComparison() {
@@ -2519,10 +2528,29 @@
       const forcedRank = effect.forceRank;
       if (forcedRank) {
         effect.forceRank = null;
+        const skillName = effect.forceSkillName || "技能牌";
+        const sourceName = effect.forceSourceName || ownerName(owner);
+        effect.forceSkillName = "";
+        effect.forceSourceName = "";
         const index = state.deck.findIndex(card => card.rank === forcedRank);
         if (index >= 0) return state.deck.splice(index, 1)[0];
+        const fallback = drawNumberCard();
+        if (fallback) {
+          effect.forceFailureTitle = skillName;
+          effect.forceFailureNote = `${sourceName}${skillName}发动失败，数字牌“${forcedRank}”已不在牌堆中，故${ownerName(owner)}抽到数字牌“${fallback.rank}”`;
+        }
+        return fallback;
       }
       return drawNumberCard();
+    }
+
+    function flushForcedDrawFailure(owner) {
+      const effect = state.effects[owner];
+      if (!effect.forceFailureNote) return;
+      addRecord(owner, effect.forceFailureNote);
+      setMessage(`${effect.forceFailureTitle || "技能牌"}发动失败`, effect.forceFailureNote, true);
+      effect.forceFailureNote = "";
+      effect.forceFailureTitle = "";
     }
 
     function handValue(hand) {
