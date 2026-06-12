@@ -1416,6 +1416,12 @@
       touch-action: none;
     }
 
+    .predict-item.selected img {
+      outline: 3px solid rgba(255, 48, 61, 0.92);
+      box-shadow: 0 0 0 4px rgba(255, 213, 106, 0.26), 0 18px 34px rgba(0,0,0,0.5);
+      transform: translateY(-6px) scale(1.03);
+    }
+
     .predict-item.dragging { opacity: 0.68; transform: scale(0.96); }
 
     .predict-item img {
@@ -2327,20 +2333,77 @@
         await wait(1200);
         return;
       }
-      const chosen = owner === "player" ? candidates[0] : candidates[secureRandomInt(candidates.length)];
+      const chosen = owner === "player" ? await chooseRerollCardOverlay(candidates) : candidates[secureRandomInt(candidates.length)];
+      if (!chosen) return;
       hand.splice(chosen.index, 1);
+      invalidateHandRenderCache();
+      render();
       addRecord(owner, `${ownerName(owner)}因“改运”废弃数字牌“${chosen.card.rank}”`);
       setMessage("改运", `${ownerName(owner)}废弃了${chosen.card.label}，重新抽取1张数字牌。`, true);
-      await wait(900);
+      await showDestroyedCard(chosen.card, { hidden: false, alt: `${ownerName(owner)}改运废弃${chosen.card.label}` });
       const newCard = drawNumberCardFor(owner);
       if (!newCard) {
-        setMessage("改运失败", "数字牌牌堆已空，无法重新抽牌；结束回合后会比较大小。", true);
+        setMessage("改运抽牌失败", "改运抽牌失败", true);
+        addRecord(owner, `${ownerName(owner)}改运抽牌失败，数字牌牌堆已空`);
         await wait(1200);
         return;
       }
-      await showcaseCard(newCard, { hidden: owner === "dealer", alt: `${ownerName(owner)}重新抽牌` });
-      await resolveDrawnNumberCard(owner, newCard);
+      await dealCardToTable(newCard, owner === "dealer", owner);
       addRecord(owner, `${ownerName(owner)}因“改运”重新抽到数字牌“${newCard.rank}”`);
+      flushForcedDrawFailure(owner);
+      await resolveDrawnNumberCard(owner, newCard);
+      render();
+    }
+
+    function chooseRerollCardOverlay(candidates) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const panel = document.createElement("div");
+        const title = document.createElement("div");
+        const cardRow = document.createElement("div");
+        const done = document.createElement("button");
+        let selected = null;
+
+        overlay.className = "predict-overlay";
+        panel.className = "predict-panel";
+        title.className = "predict-title";
+        cardRow.className = "predict-cards";
+        done.className = "inspect-action";
+        done.type = "button";
+        done.disabled = true;
+        title.textContent = "改运：选择要废弃的数字牌";
+        done.textContent = "确定";
+
+        candidates.forEach(candidate => {
+          const item = document.createElement("div");
+          const img = document.createElement("img");
+          const label = document.createElement("div");
+          item.className = "predict-item";
+          img.alt = `选择废弃${candidate.card.label}`;
+          img.draggable = false;
+          label.className = "predict-label";
+          label.textContent = candidate.card.label;
+          setResilientImage(img, candidate.card.imageCandidates, img.alt);
+          item.append(img, label);
+          item.addEventListener("click", () => {
+            selected = candidate;
+            cardRow.querySelectorAll(".predict-item").forEach(node => node.classList.remove("selected"));
+            item.classList.add("selected");
+            done.disabled = false;
+          });
+          cardRow.appendChild(item);
+        });
+
+        done.addEventListener("click", () => {
+          if (!selected) return;
+          overlay.remove();
+          resolve(selected);
+        });
+
+        panel.append(title, cardRow, done);
+        overlay.appendChild(panel);
+        document.body.appendChild(overlay);
+      });
     }
 
     async function drawBestCard(owner) {
