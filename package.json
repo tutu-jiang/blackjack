@@ -1,0 +1,17 @@
+{
+  "name": "deadly-blackjack",
+  "version": "1.0.0",
+  "private": true,
+  "description": "致命21点：可打包成安卓 APK 的单文件网页游戏。",
+  "scripts": {
+    "prepare:android": "node tools/prepare-capacitor-web.mjs",
+    "android:add": "npm run prepare:android && npx cap add android",
+    "android:sync": "npm run prepare:android && npx cap sync android",
+    "android:open": "npm run android:sync && npx cap open android"
+  },
+  "devDependencies": {
+    "@capacitor/android": "latest",
+    "@capacitor/cli": "latest",
+    "@capacitor/core": "latest"
+  }
+}
