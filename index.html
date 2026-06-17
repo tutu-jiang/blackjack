@@ -1,0 +1,3196 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#061b14" />
+  <title>致命21点</title>
+  <style>
+    :root {
+      --bg: #061b14;
+      --felt: #0f5d3f;
+      --felt-dark: #083727;
+      --gold: #ffd56a;
+      --gold-deep: #b87921;
+      --white: #fff8e8;
+      --muted: #b8d4c6;
+      --danger: #ff6b6b;
+      --blood: #b1121c;
+      --blood-bright: #ff303d;
+      --blood-dark: #3d0508;
+      --rot-green: #092c21;
+      --bone: #d7c9b1;
+      --success: #54e38f;
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+    }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+    html, body { min-height: 100%; }
+
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "Microsoft YaHei", sans-serif;
+      color: var(--white);
+      background:
+        radial-gradient(circle at 20% 0%, rgba(255, 213, 106, 0.18), transparent 32rem),
+        radial-gradient(circle at 80% 20%, rgba(84, 227, 143, 0.12), transparent 28rem),
+        linear-gradient(135deg, #04100c, var(--bg) 48%, #020907);
+      overflow-x: hidden;
+    }
+
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      z-index: -1;
+      background:
+        repeating-linear-gradient(118deg, rgba(255,255,255,0.035) 0 1px, transparent 1px 46px),
+        radial-gradient(circle at 50% 18%, rgba(255,213,106,0.08), transparent 28rem);
+      mask-image: radial-gradient(circle at center, black, transparent 88%);
+      pointer-events: none;
+    }
+
+    .app {
+      width: min(100%, 560px);
+      min-height: 100svh;
+      margin: 0 auto;
+      padding: max(10px, env(safe-area-inset-top)) 12px max(14px, env(safe-area-inset-bottom));
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .header-actions {
+      display: inline-flex;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 7px;
+      flex: 0 0 auto;
+    }
+
+    .logo {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      min-width: 0;
+      padding: 5px 10px 6px 5px;
+      border-radius: 12px;
+      background:
+        linear-gradient(90deg, rgba(18, 8, 5, 0.96), rgba(56, 18, 14, 0.78) 48%, rgba(10, 38, 27, 0.72)),
+        rgba(0,0,0,0.28);
+      border: 1px solid rgba(255, 213, 106, 0.34);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.26), inset 0 0 18px rgba(255,213,106,0.07), 0 0 0 1px rgba(0,0,0,0.36);
+    }
+
+    .logo::before {
+      content: "";
+      position: absolute;
+      inset: 4px 6px 4px 50px;
+      border-top: 1px solid rgba(255, 213, 106, 0.24);
+      border-bottom: 1px solid rgba(255, 213, 106, 0.14);
+      border-radius: 12px;
+      pointer-events: none;
+    }
+
+    .logo::after {
+      content: "DEADLY BLACKJACK";
+      position: absolute;
+      left: 56px;
+      bottom: 2px;
+      color: rgba(255, 107, 107, 0.48);
+      font-size: 7px;
+      font-weight: 1000;
+      letter-spacing: 0.18em;
+      pointer-events: none;
+    }
+
+    .logo-emblem {
+      width: clamp(32px, 8.4vw, 42px);
+      height: clamp(32px, 8.4vw, 42px);
+      flex: 0 0 auto;
+      display: grid;
+      place-items: center;
+      border-radius: 14px;
+      overflow: hidden;
+      color: #2d1900;
+      font-size: clamp(21px, 6vw, 30px);
+      font-weight: 1000;
+      background: linear-gradient(145deg, #fff6c8, var(--gold) 48%, #55cf84);
+      border: 1px solid rgba(255,255,255,0.34);
+      box-shadow: 0 0 0 2px rgba(145, 8, 14, 0.24), 0 10px 22px rgba(0,0,0,0.28);
+    }
+
+    .logo-icon {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .logo-icon[hidden],
+    .logo-fallback[hidden] { display: none; }
+
+    .logo-fallback { line-height: 1; filter: drop-shadow(0 2px 0 rgba(255,255,255,0.35)); }
+
+    h1 {
+      position: relative;
+      z-index: 1;
+      margin: 0;
+      font-size: clamp(24px, 6.6vw, 36px);
+      letter-spacing: 0.08em;
+      line-height: 0.95;
+      color: #fff3c0;
+      font-family: "Microsoft YaHei", "PingFang SC", system-ui, sans-serif;
+      font-weight: 1000;
+      white-space: nowrap;
+      -webkit-text-stroke: 0.5px rgba(63, 20, 5, 0.85);
+      text-shadow:
+        0 2px 0 #5a2107,
+        0 4px 0 rgba(0,0,0,0.72),
+        0 9px 16px rgba(0,0,0,0.45),
+        0 0 16px rgba(255, 213, 106, 0.28);
+    }
+
+    h1 .title-accent {
+      color: var(--gold);
+      font-size: 0.66em;
+      margin-left: 0.08em;
+      letter-spacing: 0.03em;
+      -webkit-text-stroke: 0.35px rgba(50, 16, 3, 0.9);
+      text-shadow: 0 2px 0 rgba(70, 24, 5, 0.92), 0 0 12px rgba(255, 48, 61, 0.32);
+    }
+
+    .developer {
+      color: var(--gold);
+      font-size: clamp(11px, 2.8vw, 14px);
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.32);
+      white-space: nowrap;
+      padding: 5px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(255, 213, 106, 0.28);
+      background: rgba(0,0,0,0.18);
+    }
+
+    .score-pill {
+      border: 1px solid rgba(255, 213, 106, 0.35);
+      background: rgba(0,0,0,0.22);
+      border-radius: 999px;
+      padding: 8px 11px;
+      font-weight: 800;
+      box-shadow: inset 0 0 16px rgba(255,255,255,0.03);
+      white-space: nowrap;
+    }
+
+    .life-hearts {
+      margin-left: 4px;
+      color: var(--danger);
+      font-size: 17px;
+      letter-spacing: 0.08em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.32), 0 0 8px rgba(255,107,107,0.44);
+    }
+
+    .turn-clock {
+      display: none;
+      margin-left: -1px;
+      font-size: 22px;
+      line-height: 1;
+      transform-origin: 50% 70%;
+      filter: drop-shadow(0 2px 2px rgba(0,0,0,0.65)) drop-shadow(0 0 8px rgba(255,76,76,0.46));
+    }
+
+    .turn-clock.active {
+      display: inline-block;
+      animation: alarm-shake 0.48s steps(2, end) infinite;
+    }
+
+    @keyframes alarm-shake {
+      0% { transform: translate(0, 0) rotate(0deg); }
+      15% { transform: translate(-1px, 0) rotate(-14deg); }
+      30% { transform: translate(1px, -1px) rotate(12deg); }
+      45% { transform: translate(-1px, 1px) rotate(-10deg); }
+      60% { transform: translate(1px, 0) rotate(10deg); }
+      75% { transform: translate(-1px, -1px) rotate(-8deg); }
+      100% { transform: translate(0, 0) rotate(0deg); }
+    }
+
+    .table {
+      position: relative;
+      flex: 1;
+      min-height: 690px;
+      border-radius: 28px;
+      padding: 16px 12px;
+      border: 1px solid rgba(117, 18, 22, 0.36);
+      background:
+        radial-gradient(circle at 18% 18%, rgba(95, 6, 9, 0.34) 0 3.4rem, transparent 3.8rem),
+        radial-gradient(circle at 78% 63%, rgba(116, 8, 11, 0.22) 0 2.2rem, transparent 2.7rem),
+        radial-gradient(ellipse at center, rgba(210, 201, 177, 0.045), transparent 56%),
+        repeating-linear-gradient(118deg, rgba(255,255,255,0.026) 0 1px, transparent 1px 20px),
+        repeating-radial-gradient(circle at center, transparent 0 18px, rgba(0,0,0,0.11) 19px 20px),
+        linear-gradient(155deg, #0a4b35 0%, #093527 42%, #061b15 100%);
+      box-shadow: var(--shadow), inset 0 0 105px rgba(0,0,0,0.58), inset 0 0 0 2px rgba(0,0,0,0.24);
+      overflow: hidden;
+    }
+
+    .table::before {
+      content: "";
+      position: absolute;
+      inset: 18px;
+      border: 2px dashed rgba(86, 28, 22, 0.48);
+      border-radius: 22px;
+      background:
+        radial-gradient(circle at 9% 8%, rgba(151, 12, 18, 0.24), transparent 4.5rem),
+        radial-gradient(circle at 93% 18%, rgba(54, 0, 0, 0.3), transparent 3.4rem),
+        linear-gradient(90deg, rgba(0,0,0,0.16), transparent 24%, transparent 76%, rgba(0,0,0,0.18));
+      mix-blend-mode: multiply;
+      pointer-events: none;
+    }
+
+    .table::after {
+      content: "DEADLY BLACKJACK";
+      position: absolute;
+      left: 50%;
+      top: 49%;
+      transform: translate(-50%, -50%) rotate(-8deg);
+      color: rgba(116, 6, 9, 0.16);
+      font-size: 32px;
+      font-weight: 1000;
+      letter-spacing: 0.16em;
+      white-space: nowrap;
+      text-shadow: 0 1px 0 rgba(0,0,0,0.28);
+      pointer-events: none;
+    }
+
+
+    .table-grime {
+      position: absolute;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      overflow: hidden;
+      opacity: 0.92;
+    }
+
+    .table-grime::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        repeating-linear-gradient(32deg, transparent 0 22px, rgba(0,0,0,0.12) 23px 24px, transparent 25px 48px),
+        repeating-linear-gradient(116deg, transparent 0 34px, rgba(210,201,177,0.035) 35px 36px, transparent 37px 74px),
+        linear-gradient(90deg, rgba(0,0,0,0.24), transparent 18%, transparent 76%, rgba(0,0,0,0.28));
+      mix-blend-mode: multiply;
+    }
+
+    .table-grime::after {
+      content: "";
+      position: absolute;
+      left: 11%;
+      top: 15%;
+      width: 48%;
+      height: 19%;
+      background:
+        radial-gradient(ellipse at 16% 46%, rgba(80, 4, 7, 0.48), transparent 30%),
+        radial-gradient(ellipse at 41% 35%, rgba(105, 7, 10, 0.32), transparent 24%),
+        linear-gradient(100deg, rgba(74, 4, 6, 0.34), rgba(74,4,6,0.1) 58%, transparent);
+      filter: blur(10px);
+      transform: rotate(-9deg);
+      opacity: 0.8;
+      mix-blend-mode: multiply;
+    }
+
+    .blood-smear {
+      position: absolute;
+      display: block;
+      pointer-events: none;
+      background: linear-gradient(90deg, rgba(89, 3, 6, 0.68), rgba(130, 9, 13, 0.24), transparent);
+      filter: blur(3px);
+      mix-blend-mode: multiply;
+      opacity: 0.78;
+    }
+
+    .blood-smear.one { left: 9%; top: 25%; width: 22%; height: 8%; transform: rotate(-18deg); border-radius: 58% 42% 54% 46%; }
+    .blood-smear.two { right: 12%; bottom: 24%; width: 19%; height: 6%; transform: rotate(28deg); border-radius: 48% 52% 38% 62%; }
+    .blood-smear.three { left: 48%; top: 56%; width: 26%; height: 5%; transform: rotate(8deg); border-radius: 999px; opacity: 0.5; }
+
+    .scratch-mark {
+      position: absolute;
+      width: 28%;
+      height: 1px;
+      background: rgba(215, 201, 177, 0.1);
+      box-shadow: 0 8px 0 rgba(215, 201, 177, 0.055), 0 17px 0 rgba(215, 201, 177, 0.04);
+      transform: rotate(-16deg);
+      opacity: 0.65;
+    }
+
+    .scratch-mark.one { right: 10%; top: 34%; }
+    .scratch-mark.two { left: 12%; bottom: 29%; transform: rotate(14deg); }
+
+    .zone {
+      position: relative;
+      z-index: 1;
+      min-height: 222px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .zone + .zone { margin-top: 12px; }
+
+    .zone-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+    }
+
+    .zone-title {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      font-weight: 900;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+    }
+
+    .avatar {
+      width: 34px;
+      height: 34px;
+      display: inline-grid;
+      place-items: center;
+      border-radius: 50%;
+      color: #fff2ca;
+      font-size: 18px;
+      font-weight: 1000;
+      background: radial-gradient(circle at 32% 24%, rgba(255,255,255,0.22), transparent 28%), linear-gradient(145deg, #27120c, #071910);
+      border: 1px solid rgba(255, 48, 61, 0.32);
+      box-shadow: inset 0 0 12px rgba(255,213,106,0.08), 0 0 0 2px rgba(0,0,0,0.28), 0 7px 14px rgba(0,0,0,0.28);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.55), 0 0 8px rgba(255,107,107,0.45);
+    }
+
+    .dealer-avatar {
+      color: #ffd56a;
+      background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.24), transparent 26%), linear-gradient(145deg, #43200d, #071910 72%);
+    }
+
+    .player-avatar {
+      color: #eaffdc;
+      background: radial-gradient(circle at 35% 25%, rgba(255,255,255,0.22), transparent 26%), linear-gradient(145deg, #103d2d, #050f0b 74%);
+    }
+
+    .cards {
+      min-height: 162px;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: clamp(6px, 2vw, 12px);
+      padding: 8px 26px 8px 8px;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x proximity;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(255,213,106,0.55) rgba(0,0,0,0.12);
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .cards::-webkit-scrollbar { height: 5px; }
+    .cards::-webkit-scrollbar-thumb { background: rgba(255,213,106,0.55); border-radius: 999px; }
+
+    .zone::after {
+      content: "›";
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      z-index: 3;
+      width: 22px;
+      height: 44px;
+      display: none;
+      place-items: center;
+      border-radius: 999px;
+      color: rgba(255, 213, 106, 0.9);
+      background: linear-gradient(90deg, transparent, rgba(0,0,0,0.34));
+      font-size: 30px;
+      font-weight: 1000;
+      pointer-events: none;
+      text-shadow: 0 2px 6px rgba(0,0,0,0.65);
+    }
+
+    .zone.has-overflow::after { display: grid; }
+
+    .skill-count {
+      position: absolute;
+      left: 38px;
+      top: 34px;
+      z-index: 4;
+      min-height: 22px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      color: rgba(255,248,232,0.9);
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.08);
+      font-size: 12px;
+      font-weight: 900;
+      letter-spacing: 0.04em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.35);
+      pointer-events: none;
+    }
+
+    .hand-tabs {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      padding: 5px 0 0;
+      perspective: 600px;
+    }
+
+    .hand-tab {
+      position: relative;
+      min-width: 110px;
+      min-height: 46px;
+      overflow: hidden;
+      border: 1px solid rgba(129, 24, 27, 0.54);
+      border-radius: 14px 4px 14px 4px;
+      color: rgba(232, 222, 206, 0.86);
+      background:
+        linear-gradient(180deg, rgba(13, 26, 20, 0.96), rgba(2, 9, 7, 0.98)),
+        radial-gradient(circle at 18% 0%, rgba(112, 10, 14, 0.3), transparent 56%);
+      box-shadow: 0 5px 0 #020505, 0 12px 20px rgba(0,0,0,0.36), inset 0 0 22px rgba(0,0,0,0.32);
+      font-size: 16px;
+      font-weight: 1000;
+      letter-spacing: 0.05em;
+      cursor: pointer;
+      transform: skewX(-5deg);
+    }
+
+    .hand-tab::before {
+      content: "";
+      position: absolute;
+      inset: 5px;
+      border: 1px solid rgba(215, 201, 177, 0.13);
+      border-radius: 10px 3px 10px 3px;
+      pointer-events: none;
+    }
+
+    .hand-tab::after {
+      content: "";
+      position: absolute;
+      left: -18%;
+      top: -48%;
+      width: 50%;
+      height: 170%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent);
+      transform: rotate(18deg);
+      pointer-events: none;
+    }
+
+    .hand-tab.active {
+      border-color: rgba(255, 48, 61, 0.86);
+      background:
+        radial-gradient(circle at 18% 12%, rgba(255, 48, 61, 0.34), transparent 48%),
+        linear-gradient(180deg, rgba(74, 8, 12, 0.98), rgba(20, 5, 6, 0.98));
+      color: #fff0e8;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.62), 0 0 10px rgba(255, 48, 61, 0.44);
+      box-shadow: 0 5px 0 #290306, 0 0 0 1px rgba(255, 48, 61, 0.16), 0 14px 26px rgba(0,0,0,0.42), inset 0 0 22px rgba(255, 48, 61, 0.14);
+    }
+
+    .card-shell.skill-card-shell {
+      background: linear-gradient(160deg, rgba(45, 18, 10, 0.92), rgba(5, 35, 26, 0.92));
+    }
+
+    .card-shell.skill-card-shell::after {
+      content: "技能";
+      position: absolute;
+      right: 6px;
+      top: 6px;
+      z-index: 2;
+      padding: 2px 6px;
+      border-radius: 999px;
+      color: #2b1700;
+      background: rgba(255, 213, 106, 0.92);
+      font-size: 11px;
+      font-weight: 1000;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+      pointer-events: none;
+    }
+
+    .empty-skill-hint {
+      color: rgba(255,248,232,0.72);
+      font-size: 14px;
+      font-weight: 800;
+      padding: 18px 8px;
+    }
+
+    .card-shell {
+      position: relative;
+      width: clamp(78px, 23vw, 116px);
+      flex: 0 0 clamp(78px, 23vw, 116px);
+      aspect-ratio: 0.69;
+      border-radius: 10px;
+      background: transparent;
+      box-shadow: 0 8px 18px rgba(0,0,0,0.42), 0 0 0 1px rgba(255,255,255,0.06);
+      transform-origin: bottom center;
+      overflow: hidden;
+      cursor: zoom-in;
+    }
+
+    .card-shell:nth-child(2n) { transform: translateY(4px) rotate(1.5deg); }
+    .card-shell:nth-child(3n) { transform: translateY(-3px) rotate(-1.5deg); }
+
+    .card-shell.player-card.player-hole-card::before {
+      content: "己方盖牌";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: start center;
+      padding-top: 9px;
+      color: rgba(255,255,255,0.98);
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 0.12em;
+      border-radius: inherit;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.75), 0 0 8px rgba(255,213,106,0.54);
+      background:
+        linear-gradient(180deg, rgba(42, 46, 44, 0.70) 0%, rgba(80, 85, 82, 0.48) 42%, rgba(170, 174, 168, 0.18) 100%),
+        repeating-linear-gradient(135deg, rgba(255,255,255,0.11) 0 1px, transparent 1px 8px);
+      box-shadow: inset 0 0 0 2px rgba(224,230,222,0.68), inset 0 0 30px rgba(0,0,0,0.34);
+      pointer-events: none;
+    }
+
+    .card-shell.player-card.player-hole-card::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: 3;
+      border-radius: inherit;
+      border: 1px solid rgba(255,255,255,0.62);
+      box-shadow: inset 0 0 16px rgba(255,255,255,0.13), 0 0 10px rgba(0,0,0,0.22);
+      pointer-events: none;
+    }
+
+    .card-shell.revealed-hole-card::before {
+      content: "已透视";
+      position: absolute;
+      inset: 0;
+      z-index: 2;
+      display: grid;
+      place-items: start center;
+      padding-top: 9px;
+      color: rgba(255,255,255,0.96);
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 0.12em;
+      border-radius: inherit;
+      background: linear-gradient(180deg, rgba(255, 213, 106, 0.28), rgba(255,255,255,0.04) 58%);
+      box-shadow: inset 0 0 0 2px rgba(255,213,106,0.45);
+      pointer-events: none;
+    }
+
+    .card-shell.hidden-card { cursor: default; }
+    .card-shell.back-card { background: #123c2d; }
+
+    .card {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: transparent;
+    }
+
+    .card.is-missing {
+      object-fit: contain;
+      padding: 10px;
+      color: rgba(35, 23, 0, 0.72);
+      background: #f8f0dc;
+      font-size: 12px;
+      font-weight: 900;
+      text-align: center;
+    }
+
+    .card-back {
+      object-fit: cover;
+      background: #123c2d;
+      transform: scale(1.015);
+    }
+
+    @keyframes deal {
+      from { opacity: 0; transform: translateY(-18px) scale(0.92) rotate(-5deg); }
+      to { opacity: 1; }
+    }
+
+    .center-panel {
+      position: relative;
+      z-index: 1;
+      margin: 6px auto 9px;
+      width: min(100%, 450px);
+      min-height: 82px;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      border-radius: 22px;
+      padding: 10px 12px;
+      background: rgba(0, 0, 0, 0.22);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      box-shadow: inset 0 0 28px rgba(0,0,0,0.25);
+    }
+
+    .center-content {
+      width: 100%;
+      display: grid;
+      gap: 4px;
+    }
+
+
+    .message {
+      margin: 0;
+      min-width: 0;
+      font-size: clamp(14px, 4vw, 24px);
+      line-height: 1.15;
+      font-weight: 900;
+      color: var(--gold);
+      white-space: nowrap;
+    }
+
+    .message.win,
+    .message.lose {
+      white-space: normal;
+      font-size: clamp(17px, 4.5vw, 24px);
+    }
+
+    .message.typing::after {
+      content: "▌";
+      display: inline-block;
+      margin-left: 3px;
+      color: rgba(255, 213, 106, 0.9);
+      animation: cursor-blink 760ms steps(1) infinite;
+    }
+
+    .hint {
+      margin: 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .hint:empty { display: none; }
+
+    .rule-button {
+      min-width: 48px;
+      min-height: 30px;
+      padding: 0 11px;
+      border-radius: 999px;
+      font-size: 13px;
+      color: var(--gold);
+      background: rgba(0,0,0,0.32);
+      border: 1px solid rgba(255, 213, 106, 0.42);
+      box-shadow: inset 0 0 14px rgba(255,213,106,0.08), 0 8px 18px rgba(0,0,0,0.24);
+    }
+
+    .rule-button:active:not(:disabled) {
+      transform: translateY(2px);
+      box-shadow: inset 0 0 14px rgba(255,213,106,0.08), 0 4px 10px rgba(0,0,0,0.22);
+    }
+
+    .rules-modal[hidden] { display: none; }
+
+    body.rules-open { overflow: hidden; }
+
+    .rules-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 60;
+      display: grid;
+      place-items: center;
+      padding: max(16px, env(safe-area-inset-top)) 16px max(16px, env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at 50% 0%, rgba(160, 15, 15, 0.26), transparent 34rem),
+        linear-gradient(180deg, rgba(0,0,0,0.72), rgba(0,0,0,0.9));
+      backdrop-filter: blur(7px);
+    }
+
+    .rules-dialog {
+      position: relative;
+      width: min(94vw, 520px);
+      max-height: min(86svh, 720px);
+      overflow: auto;
+      padding: 22px 18px 20px;
+      border-radius: 24px;
+      color: #f8ead4;
+      border: 1px solid rgba(255, 213, 106, 0.35);
+      background:
+        linear-gradient(180deg, rgba(10, 10, 8, 0.72), rgba(11, 26, 19, 0.88)),
+        radial-gradient(circle at 16% 88%, rgba(119, 4, 4, 0.55), transparent 15rem),
+        linear-gradient(135deg, #170706, #071611 58%, #050201);
+      box-shadow: 0 30px 90px rgba(0,0,0,0.78), inset 0 0 36px rgba(255,213,106,0.06);
+    }
+
+    .rules-dialog::before {
+      content: "";
+      position: absolute;
+      inset: auto 0 0;
+      height: 34%;
+      pointer-events: none;
+      background:
+        radial-gradient(circle at 20% 100%, rgba(122, 0, 0, 0.45), transparent 44%),
+        repeating-linear-gradient(100deg, rgba(255,255,255,0.04) 0 1px, transparent 1px 18px);
+      opacity: 0.8;
+      mask-image: linear-gradient(transparent, black 36%);
+    }
+
+    .rules-close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      width: 38px;
+      height: 38px;
+      min-height: 38px;
+      border-radius: 50%;
+      color: #fff1d0;
+      background: rgba(20, 3, 3, 0.76);
+      border: 1px solid rgba(255, 213, 106, 0.35);
+      box-shadow: 0 8px 18px rgba(0,0,0,0.45);
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .rules-kicker {
+      color: rgba(255, 107, 107, 0.88);
+      font-size: 12px;
+      font-weight: 1000;
+      letter-spacing: 0.24em;
+      text-transform: uppercase;
+    }
+
+    .rules-dialog h2 {
+      margin: 4px 0 14px;
+      color: var(--gold);
+      font-size: clamp(26px, 8vw, 38px);
+      line-height: 1;
+      text-shadow: 0 3px 0 rgba(0,0,0,0.62), 0 0 18px rgba(145, 8, 14, 0.24);
+    }
+
+    .rules-body {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+    }
+
+    .rules-body section {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .rules-body h3 {
+      margin: 0 0 8px;
+      color: #fff6d0;
+      font-size: 17px;
+    }
+
+    .rules-body p {
+      margin: 5px 0;
+      color: #dfd4c4;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+
+
+
+
+    .record-dialog { padding-bottom: 24px; }
+
+    .record-body {
+      position: relative;
+      z-index: 1;
+      display: grid;
+      gap: 12px;
+      color: #dfd4c4;
+      font-size: 14px;
+      line-height: 1.65;
+    }
+
+    .record-empty {
+      margin: 0;
+      padding: 14px;
+      border-radius: 16px;
+      color: rgba(248,234,212,0.76);
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.09);
+    }
+
+    .record-round {
+      padding: 12px;
+      border-radius: 16px;
+      background: rgba(0,0,0,0.24);
+      border: 1px solid rgba(255,255,255,0.09);
+      box-shadow: inset 0 0 18px rgba(0,0,0,0.18);
+    }
+
+    .record-round h3,
+    .record-round h4 {
+      margin: 0 0 8px;
+      color: #fff6d0;
+      font-size: 17px;
+    }
+
+    .record-round h4 {
+      margin-top: 12px;
+      color: rgba(255,107,107,0.9);
+      font-size: 15px;
+    }
+
+    .record-round ol {
+      margin: 6px 0 0;
+      padding-left: 1.25em;
+    }
+
+    .record-round li { margin: 5px 0; }
+
+    .record-line-title {
+      color: #fff1d0;
+      font-weight: 1000;
+    }
+
+
+    .story-modal[hidden] { display: none; }
+
+    body.story-open { overflow: hidden; }
+
+    .story-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 70;
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      gap: 8px;
+      padding: max(10px, env(safe-area-inset-top)) 10px max(10px, env(safe-area-inset-bottom));
+      background:
+        radial-gradient(circle at 50% 18%, rgba(92, 4, 8, 0.34), transparent 26rem),
+        linear-gradient(180deg, #030202, #07110d 48%, #010202);
+      overflow: hidden;
+    }
+
+    .story-modal::before {
+      content: "";
+      position: absolute;
+      inset: -10%;
+      background:
+        repeating-linear-gradient(95deg, rgba(255,255,255,0.028) 0 1px, transparent 1px 28px),
+        radial-gradient(circle at center, transparent 0 38%, rgba(0,0,0,0.62) 80%);
+      animation: story-noise 5s steps(6) infinite;
+      opacity: 0.54;
+      pointer-events: none;
+    }
+
+    .story-topbar,
+    .story-footer {
+      position: relative;
+      z-index: 2;
+      width: min(100%, 520px);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .story-counter {
+      color: rgba(244, 215, 215, 0.78);
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.6);
+    }
+
+    .story-stage {
+      position: relative;
+      z-index: 1;
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      width: min(100%, 540px);
+      margin: 0 auto;
+      animation: story-image-enter 420ms ease-out both;
+    }
+
+    .story-frame {
+      position: relative;
+      height: 100%;
+      max-height: 100%;
+      aspect-ratio: 500 / 888;
+      max-width: 100%;
+      border: 1px solid rgba(151, 12, 18, 0.68);
+      border-radius: 4px;
+      overflow: hidden;
+      background: #050302;
+      box-shadow: 0 26px 70px rgba(0,0,0,0.82), 0 0 0 1px rgba(0,0,0,0.75), 0 0 36px rgba(151, 12, 18, 0.22);
+    }
+
+    .story-frame::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      box-shadow: inset 0 0 70px rgba(0,0,0,0.36);
+    }
+
+    .story-image {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #050302;
+      animation: story-image-focus 420ms ease-out both;
+    }
+
+    .story-skip,
+    .story-next {
+      min-height: 38px;
+      color: #f4d7d7;
+      background: linear-gradient(180deg, rgba(62, 5, 8, 0.96), rgba(20, 2, 3, 0.98));
+      border: 1px solid rgba(255, 48, 61, 0.42);
+      box-shadow: 0 5px 0 #160102, 0 14px 22px rgba(0,0,0,0.38), inset 0 0 16px rgba(255, 48, 61, 0.1);
+      text-shadow: 0 2px 0 rgba(0,0,0,0.62);
+    }
+
+    .story-skip {
+      min-width: 78px;
+      padding: 0 14px;
+      border-radius: 999px;
+      font-size: 13px;
+    }
+
+    .story-next {
+      flex: 0 0 auto;
+      min-width: 130px;
+      min-height: 46px;
+      border-radius: 16px;
+      font-size: 16px;
+      font-weight: 1000;
+    }
+
+    .story-progress {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 46px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(0,0,0,0.26);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .story-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: rgba(216, 200, 200, 0.28);
+      box-shadow: 0 0 0 1px rgba(255,255,255,0.08);
+      transition: width 180ms ease, background 180ms ease, box-shadow 180ms ease;
+    }
+
+    .story-dot.active {
+      width: 24px;
+      border-radius: 999px;
+      background: var(--blood-bright);
+      box-shadow: 0 0 14px rgba(255, 48, 61, 0.48);
+    }
+
+    @keyframes story-noise { 0%, 100% { transform: translate(0,0); } 50% { transform: translate(-1.5%, 1%); } }
+    @keyframes story-image-enter { from { opacity: 0; transform: translateX(5vw) scale(0.985); } to { opacity: 1; transform: translateX(0) scale(1); } }
+    @keyframes story-image-focus { from { transform: scale(1.035); filter: brightness(0.72) contrast(1.14); } to { transform: scale(1); filter: brightness(1) contrast(1); } }
+
+    .controls {
+      position: sticky;
+      bottom: max(10px, env(safe-area-inset-bottom));
+      z-index: 5;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      padding: 10px;
+      border-radius: 24px;
+      background: rgba(3, 14, 10, 0.82);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba(255,255,255,0.12);
+      box-shadow: 0 14px 35px rgba(0,0,0,0.35);
+    }
+
+    button {
+      min-height: 48px;
+      border: 0;
+      border-radius: 16px;
+      color: #201400;
+      font-size: 16px;
+      font-weight: 900;
+      cursor: pointer;
+      background: linear-gradient(180deg, #ffe89e, var(--gold));
+      box-shadow: 0 5px 0 var(--gold-deep), 0 10px 18px rgba(0,0,0,0.25);
+      transition: transform 120ms ease, filter 120ms ease, box-shadow 120ms ease;
+    }
+
+    button:active:not(:disabled) {
+      transform: translateY(4px);
+      box-shadow: 0 1px 0 var(--gold-deep), 0 5px 12px rgba(0,0,0,0.22);
+    }
+
+    .story-next:active:not(:disabled),
+    .story-skip:active:not(:disabled),
+    .hand-tab:active:not(:disabled) {
+      transform: translateY(3px) skewX(-5deg);
+      box-shadow: 0 2px 0 #250305, 0 8px 16px rgba(0,0,0,0.32), inset 0 0 18px rgba(255, 48, 61, 0.12);
+    }
+
+    .story-next:active:not(:disabled),
+    .story-skip:active:not(:disabled) {
+      transform: translateY(3px);
+    }
+
+    button:disabled {
+      cursor: not-allowed;
+      opacity: 0.45;
+      filter: grayscale(0.65);
+    }
+
+    .secondary {
+      color: var(--white);
+      background: linear-gradient(180deg, #205c47, #123c2d);
+      box-shadow: 0 5px 0 #092118, 0 10px 18px rgba(0,0,0,0.25);
+    }
+
+    .rules {
+      padding: 12px 14px;
+      border-radius: 20px;
+      background: rgba(255,255,255,0.07);
+      border: 1px solid rgba(255,255,255,0.1);
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .rules strong { color: var(--white); }
+    .rule-hot { color: #ff6b6b; font-weight: 1000; }
+    .win { color: var(--success); }
+    .lose { color: var(--danger); }
+
+    .draw-showcase {
+      position: fixed;
+      inset: 0;
+      z-index: 30;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.58);
+      backdrop-filter: blur(4px);
+      pointer-events: none;
+    }
+
+    .showcase-stack {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+    }
+
+    .showcase-caption {
+      padding: 7px 16px;
+      border-radius: 999px;
+      color: #fff4d8;
+      background: rgba(28, 3, 5, 0.78);
+      border: 1px solid rgba(255, 48, 61, 0.46);
+      box-shadow: 0 0 18px rgba(255, 48, 61, 0.18), inset 0 0 14px rgba(255, 48, 61, 0.08);
+      font-size: clamp(17px, 5vw, 24px);
+      font-weight: 1000;
+      letter-spacing: 0.08em;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.62), 0 0 10px rgba(255,48,61,0.36);
+    }
+
+    .showcase-stack.ash-out { animation: ash-out 900ms ease-in both; }
+
+    .showcase-card.hold-showcase { animation: inspect-card 220ms ease-out both; }
+
+    .showcase-card,
+    .inspect-overlay img {
+      width: min(68vw, 360px);
+      min-width: 230px;
+      max-height: 76svh;
+      aspect-ratio: 0.69;
+      background: transparent;
+      border-radius: 18px;
+    }
+
+    .showcase-card {
+      position: relative;
+      transform-style: preserve-3d;
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.6);
+      animation: showcase-card 1300ms cubic-bezier(0.19, 1, 0.22, 1) both;
+    }
+
+    .showcase-card img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: inherit;
+      background: transparent;
+      backface-visibility: hidden;
+    }
+
+    .showcase-card .showcase-back { transform: rotateY(180deg); }
+
+    .deal-flight {
+      --start-x: calc(100vw + 90px);
+      --start-y: 50vh;
+      --mid-x: 50vw;
+      --mid-y: 50vh;
+      --end-x: 50vw;
+      --end-y: 50vh;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 29;
+      width: clamp(78px, 23vw, 116px);
+      flex: 0 0 clamp(78px, 23vw, 116px);
+      aspect-ratio: 0.69;
+      pointer-events: none;
+      filter: drop-shadow(0 12px 18px rgba(0,0,0,0.44));
+      will-change: transform, opacity;
+      animation: fly-card-to-target 920ms cubic-bezier(0.18, 0.86, 0.28, 1) both;
+    }
+
+    .deal-flight img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .destroy-showcase {
+      position: fixed;
+      inset: 0;
+      z-index: 33;
+      display: grid;
+      place-items: center;
+      pointer-events: none;
+      background: radial-gradient(circle at 50% 48%, rgba(95, 13, 10, 0.28), transparent 44%);
+    }
+
+    .destroy-card {
+      position: relative;
+      width: min(62vw, 310px);
+      aspect-ratio: 0.69;
+      filter: drop-shadow(0 24px 28px rgba(0,0,0,0.62));
+      animation: card-destroy-ash 1700ms ease-in both;
+      will-change: transform, opacity, filter;
+    }
+
+    .destroy-card::after {
+      content: "";
+      position: absolute;
+      inset: -8%;
+      border-radius: 18px;
+      background:
+        radial-gradient(circle at 24% 28%, rgba(210, 32, 24, 0.54) 0 2px, transparent 3px),
+        radial-gradient(circle at 72% 34%, rgba(255, 230, 194, 0.42) 0 1px, transparent 3px),
+        radial-gradient(circle at 46% 72%, rgba(118, 118, 118, 0.56) 0 2px, transparent 4px),
+        linear-gradient(180deg, transparent 18%, rgba(24, 18, 15, 0.26), rgba(0,0,0,0.58));
+      mix-blend-mode: screen;
+      opacity: 0;
+      animation: ash-dust 1700ms ease-in both;
+      pointer-events: none;
+    }
+
+    .destroy-card img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 14px;
+      background: transparent;
+    }
+
+    .swap-flight {
+      position: fixed;
+      z-index: 34;
+      left: 50%;
+      width: clamp(78px, 23vw, 116px);
+      aspect-ratio: 0.69;
+      pointer-events: none;
+      filter: drop-shadow(0 18px 22px rgba(0,0,0,0.5));
+    }
+
+    .swap-flight img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      border-radius: 10px;
+    }
+
+    .swap-to-dealer { top: 66%; animation: swap-to-dealer 1150ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+    .swap-to-player { top: 24%; animation: swap-to-player 1150ms cubic-bezier(0.2, 0.8, 0.2, 1) both; }
+
+    @keyframes swap-to-dealer {
+      0% { opacity: 0; transform: translate(-50%, 0) scale(0.82) rotate(-8deg); }
+      12% { opacity: 1; }
+      50% { opacity: 1; transform: translate(-50%, -22vh) scale(1.15) rotate(8deg); }
+      100% { opacity: 0; transform: translate(-50%, -42vh) scale(0.9) rotate(0deg); }
+    }
+
+    @keyframes swap-to-player {
+      0% { opacity: 0; transform: translate(-50%, 0) scale(0.82) rotate(8deg); }
+      12% { opacity: 1; }
+      50% { opacity: 1; transform: translate(-50%, 22vh) scale(1.15) rotate(-8deg); }
+      100% { opacity: 0; transform: translate(-50%, 42vh) scale(0.9) rotate(0deg); }
+    }
+
+    .skill-showcase {
+      position: fixed;
+      inset: 0;
+      z-index: 32;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(5px);
+      pointer-events: none;
+    }
+
+    .skill-showcase-stack {
+      display: grid;
+      justify-items: center;
+      gap: 12px;
+    }
+
+    .skill-showcase-stack.ash-out { animation: ash-out 900ms ease-in both; }
+
+    .skill-showcase-card {
+      width: min(80vw, 360px);
+      min-height: 0;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      box-shadow: none;
+      animation: skill-enter 220ms ease-out both;
+    }
+
+    .skill-showcase-card.ash-out { animation: ash-out 900ms ease-in both; }
+
+    .skill-showcase-card img {
+      width: 100%;
+      max-height: calc(100vh - 180px);
+      aspect-ratio: 0.69;
+      object-fit: contain;
+      border-radius: 12px;
+      filter: drop-shadow(0 26px 56px rgba(0,0,0,0.72));
+    }
+
+    .skill-showcase-name {
+      display: none;
+    }
+
+    .skill-showcase-caption {
+      color: #fff8e8;
+      font-size: 18px;
+      font-weight: 900;
+    }
+
+    @keyframes skill-enter {
+      from { opacity: 0; transform: translateY(22px) scale(0.82); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes ash-out {
+      0% { opacity: 1; filter: grayscale(0); transform: translateY(0) scale(1); }
+      65% { opacity: 0.55; filter: grayscale(0.7) contrast(1.3); transform: translateY(-18px) scale(0.98) skewX(-3deg); }
+      100% { opacity: 0; filter: grayscale(1) blur(8px); transform: translateY(-70px) scale(0.86) skewX(8deg); }
+    }
+
+    .inspect-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 31;
+      display: grid;
+      place-items: center;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.68);
+      backdrop-filter: blur(5px);
+      cursor: zoom-out;
+    }
+
+    .inspect-panel {
+      display: grid;
+      place-items: center;
+      gap: 14px;
+    }
+
+    .inspect-overlay img {
+      box-shadow: 0 28px 70px rgba(0, 0, 0, 0.62);
+      animation: inspect-card 220ms ease-out both;
+    }
+
+    .inspect-action {
+      min-width: 168px;
+      min-height: 46px;
+      border: 1px solid rgba(255, 213, 106, 0.62);
+      border-radius: 999px;
+      color: #2a1700;
+      background: linear-gradient(180deg, #ffe79c, #d59b36);
+      box-shadow: 0 6px 0 #6f4110, 0 16px 26px rgba(0,0,0,0.35);
+      font-size: 16px;
+      font-weight: 1000;
+      cursor: pointer;
+    }
+
+    .inspect-action:disabled {
+      opacity: 0.52;
+      cursor: not-allowed;
+      filter: grayscale(0.7);
+    }
+
+    .predict-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 33;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+      background: rgba(0, 0, 0, 0.72);
+      backdrop-filter: blur(5px);
+    }
+
+    .predict-panel {
+      width: min(94vw, 520px);
+      display: grid;
+      gap: 14px;
+      justify-items: center;
+      padding: 18px;
+      border: 1px solid rgba(255, 213, 106, 0.42);
+      border-radius: 24px;
+      background: linear-gradient(155deg, rgba(12, 49, 36, 0.96), rgba(21, 14, 8, 0.96));
+      box-shadow: 0 30px 80px rgba(0,0,0,0.65);
+    }
+
+    .predict-title {
+      color: var(--gold);
+      font-size: 24px;
+      font-weight: 1000;
+      text-shadow: 0 2px 0 rgba(0,0,0,0.45);
+    }
+
+    .predict-cards {
+      display: flex;
+      gap: 16px;
+      align-items: start;
+      justify-content: center;
+      width: 100%;
+    }
+
+    .predict-item {
+      display: grid;
+      gap: 8px;
+      justify-items: center;
+      cursor: grab;
+      touch-action: none;
+    }
+
+    .predict-item.selected img {
+      outline: 3px solid rgba(255, 48, 61, 0.92);
+      box-shadow: 0 0 0 4px rgba(255, 213, 106, 0.26), 0 18px 34px rgba(0,0,0,0.5);
+      transform: translateY(-6px) scale(1.03);
+    }
+
+    .predict-item.dragging { opacity: 0.68; transform: scale(0.96); }
+
+    .predict-item img {
+      width: min(34vw, 170px);
+      aspect-ratio: 0.69;
+      object-fit: contain;
+      border-radius: 12px;
+      box-shadow: 0 14px 26px rgba(0,0,0,0.42);
+      animation: inspect-card 220ms ease-out both;
+    }
+
+    .predict-label {
+      color: #fff8e8;
+      font-size: 14px;
+      font-weight: 900;
+    }
+
+    @keyframes inspect-card {
+      from { opacity: 0; transform: scale(0.58) rotateZ(-3deg); }
+      to { opacity: 1; transform: scale(1) rotateZ(0deg); }
+    }
+
+    @keyframes cursor-blink {
+      0%, 45% { opacity: 1; }
+      46%, 100% { opacity: 0; }
+    }
+
+    @keyframes showcase-card {
+      0% { opacity: 0; transform: scale(0.36) rotateY(0deg) rotateZ(-10deg); }
+      20% { opacity: 1; }
+      72% { opacity: 1; transform: scale(1) rotateY(720deg) rotateZ(0deg); }
+      100% { opacity: 0; transform: scale(0.28) translateY(42vh) rotateY(720deg); }
+    }
+
+    @keyframes fly-card-to-target {
+      0% {
+        opacity: 0;
+        transform: translate(calc(var(--start-x) - 50%), calc(var(--start-y) - 50%)) rotate(18deg) scale(0.72);
+      }
+      15% { opacity: 1; }
+      48% {
+        opacity: 1;
+        transform: translate(calc(var(--mid-x) - 50%), calc(var(--mid-y) - 50%)) rotate(-8deg) scale(1.08);
+      }
+      78% {
+        opacity: 1;
+        transform: translate(calc(var(--end-x) - 50%), calc(var(--end-y) - 50%)) rotate(3deg) scale(1);
+      }
+      100% {
+        opacity: 1;
+        transform: translate(calc(var(--end-x) - 50%), calc(var(--end-y) - 50%)) rotate(0deg) scale(1);
+      }
+    }
+
+    @keyframes card-destroy-ash {
+      0% { opacity: 0; transform: translateY(9vh) scale(0.72) rotate(-5deg); filter: grayscale(0) blur(0) contrast(1); }
+      16% { opacity: 1; transform: translateY(0) scale(1) rotate(0deg); }
+      56% { opacity: 1; transform: translateY(0) scale(1.02) rotate(1deg); filter: grayscale(0.1) blur(0) contrast(1.15); }
+      100% { opacity: 0; transform: translateY(-12vh) scale(0.78) rotate(9deg); filter: grayscale(1) blur(8px) contrast(0.7); }
+    }
+
+    @keyframes ash-dust {
+      0%, 38% { opacity: 0; transform: translateY(0) scale(0.94); }
+      62% { opacity: 0.95; transform: translateY(-4px) scale(1.02); }
+      100% { opacity: 0; transform: translateY(-52px) scale(1.24); }
+    }
+
+
+    @media (min-width: 520px) {
+      .table { flex: 0 0 auto; min-height: 690px; padding-bottom: 8px; }
+      .zone { min-height: 222px; }
+      .zone + .zone { margin-top: 8px; }
+      .cards { min-height: 178px; }
+    }
+
+    @media (max-width: 430px) {
+      .app { padding-top: max(6px, env(safe-area-inset-top)); gap: 7px; }
+      header { align-items: center; gap: 6px; }
+      .developer { padding: 4px 7px; font-size: 11px; }
+      .header-actions { gap: 5px; }
+      .rule-button { min-width: 44px; min-height: 28px; padding: 0 9px; font-size: 12px; }
+      .logo { padding: 4px 8px 5px 4px; gap: 7px; }
+      .logo::before { left: 46px; }
+      .logo::after { left: 52px; font-size: 6px; }
+      .logo-emblem { width: 34px; height: 34px; }
+      h1 { font-size: clamp(24px, 6.4vw, 30px); letter-spacing: 0.04em; }
+    }
+
+    @media (max-height: 780px) {
+      .table { min-height: 600px; }
+      .zone { min-height: 182px; }
+      .cards { min-height: 132px; }
+      .center-panel { min-height: 84px; padding: 10px; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .card-shell, .draw-showcase img, .inspect-overlay img { animation-duration: 1ms; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app" aria-label="Blackjack 21点小游戏">
+    <header>
+      <div class="logo" aria-label="致命21点">
+        <span class="logo-emblem">
+          <img class="logo-icon" id="app-icon" alt="游戏图标" hidden>
+          <span class="logo-fallback" id="logo-fallback">♠</span>
+        </span>
+        <h1>致命<span class="title-accent">21点</span></h1>
+      </div>
+      <div class="header-actions">
+        <button class="rule-button" id="record-button" type="button" hidden>记录</button>
+        <button class="rule-button" id="rule-button" type="button" hidden>规则</button>
+        <div class="developer">开发者：兔兔酱</div>
+      </div>
+    </header>
+
+    <section class="table">
+      <div class="table-grime" aria-hidden="true">
+        <span class="blood-smear one"></span>
+        <span class="blood-smear two"></span>
+        <span class="blood-smear three"></span>
+        <span class="scratch-mark one"></span>
+        <span class="scratch-mark two"></span>
+      </div>
+      <section class="zone" id="dealer-zone" aria-labelledby="dealer-title">
+        <div class="zone-header">
+          <div class="zone-title" id="dealer-title"><span class="avatar dealer-avatar">☠</span> 庄家 <span class="life-hearts" id="dealer-lives">❤❤❤</span><span class="turn-clock" id="dealer-turn-clock" aria-label="庄家回合" aria-hidden="true">⏰</span></div>
+          <div class="score-pill">点数：<span id="dealer-score">?</span></div>
+        </div>
+        <div class="cards" id="dealer-cards" aria-label="庄家手牌"></div>
+        <div class="skill-count" id="dealer-skills" aria-label="庄家技能牌数量">技能牌数量：0</div>
+      </section>
+
+      <section class="center-panel" aria-live="polite">
+        <div class="center-content">
+          <p class="message" id="message">点击“发牌”开始第一局</p>
+          <p class="hint" id="hint">发牌后可切换【技能牌】查看或使用</p>
+        </div>
+      </section>
+
+      <section class="zone" id="player-zone" aria-labelledby="player-title">
+        <div class="zone-header">
+          <div class="zone-title" id="player-title"><span class="avatar player-avatar">⚔</span> 玩家 <span class="life-hearts" id="player-lives">❤❤❤</span><span class="turn-clock" id="player-turn-clock" aria-label="玩家回合" aria-hidden="true">⏰</span></div>
+          <div class="score-pill">点数：<span id="player-score">0</span></div>
+        </div>
+        <div class="cards" id="player-cards" aria-label="玩家手牌"></div>
+        <div class="hand-tabs" id="player-view-tabs" aria-label="玩家牌区切换">
+          <button class="hand-tab active" id="player-number-tab" type="button" data-view="numbers">数字牌</button>
+          <button class="hand-tab" id="player-skill-tab" type="button" data-view="skills">技能牌</button>
+        </div>
+      </section>
+    </section>
+
+    <nav class="controls" aria-label="游戏操作">
+      <button id="deal-button">发牌</button>
+      <button id="hit-button" class="secondary" disabled>要牌</button>
+      <button id="stand-button" class="secondary" disabled>结束</button>
+    </nav>
+
+    <div class="story-modal" id="story-modal" role="dialog" hidden aria-modal="true" aria-label="剧情序章">
+      <header class="story-topbar">
+        <span class="story-counter" id="story-counter">第 1 幕 / 共 5 幕</span>
+        <button class="story-skip" id="story-skip" type="button">跳过</button>
+      </header>
+      <section class="story-stage" aria-live="polite">
+        <div class="story-frame" id="story-panel">
+          <img class="story-image" id="story-image" alt="剧情序章第1幕" draggable="false">
+        </div>
+      </section>
+      <footer class="story-footer">
+        <div class="story-progress" id="story-progress" aria-label="剧情进度"></div>
+        <button class="story-next" id="story-next" type="button">下一幕</button>
+      </footer>
+    </div>
+
+    <div class="rules-modal" id="record-modal" role="dialog" hidden aria-modal="true" aria-labelledby="record-title">
+      <div class="rules-dialog record-dialog">
+        <button class="rules-close" id="record-close" type="button" aria-label="关闭操作记录">×</button>
+        <div class="rules-kicker">整局操作记录</div>
+        <h2 id="record-title">游戏记录</h2>
+        <div class="record-body" id="record-body">
+          <p class="record-empty">大局开始后，这里会记录双方发牌、抽牌、技能牌和结束回合。</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="rules-modal" id="rules-modal" role="dialog" hidden aria-modal="true" aria-labelledby="rules-title">
+      <div class="rules-dialog">
+        <button class="rules-close" id="rules-close" type="button" aria-label="关闭规则说明">×</button>
+        <div class="rules-kicker">生存赌局说明</div>
+        <h2 id="rules-title">游戏规则</h2>
+        <div class="rules-body">
+          <section>
+            <h3>1.获胜规则</h3>
+            <p>①双方轮流抽数字牌，手牌点数之和接近21点者胜。</p>
+            <p>②<span class="rule-hot">双方均选择停牌后比较大小</span>。</p>
+            <p>③仅一方＞21点视为爆牌，爆牌者输。双方均＞21点，接近21点者胜。</p>
+            <p>④彼此3滴血，<span class="rule-hot">5局3胜</span>为一次完整游戏。</p>
+          </section>
+          <section>
+            <h3>2.数字牌</h3>
+            <p>①牌堆里的数字牌1~11点各一张。</p>
+            <p>②你<span class="rule-hot">绝不会</span>抽到牌桌上已有的数字牌。</p>
+          </section>
+          <section>
+            <h3>3.技能牌</h3>
+            <p>①技能牌每张不重复，<span class="rule-hot">开局</span>后双方固定获得<span class="rule-hot">2张</span>。</p>
+            <p>②每次自己回合有<span class="rule-hot">50%概率</span>获得1张新的技能牌。</p>
+            <p>③自己回合内可<span class="rule-hot">随意</span>使用技能牌。</p>
+            <p>④每局结束后，<span class="rule-hot">手上剩余技能牌会保留到下局游戏中</span>。</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const numberRanks = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11"];
+    const imageExtensions = ["jpg", "jpeg", "png", "webp", "JPG", "JPEG", "PNG", "WEBP"];
+    const numberBackImageCandidates = imageExtensions.map(extension => `img/数字牌背面.${extension}`);
+    const skillBackImageCandidates = imageExtensions.map(extension => `img/技能牌背面.${extension}`);
+    const backImageCandidates = numberBackImageCandidates;
+    const maxLives = 3;
+    // 术语预留：1-11 点牌称为“数字牌”；特殊卡称为“技能牌”。
+    // 数字牌每小局只有11张且不会重复；技能牌牌堆内不重复；每回合开始有50%概率获得1张剩余随机技能牌。
+    const turnSkillDrawChance = 0.5;
+
+    const state = {
+      deck: [],
+      skillDeck: [],
+      player: [],
+      dealer: [],
+      playerSkills: [],
+      dealerSkills: [],
+      roundActive: false,
+      dealerHidden: true,
+      playerHoleIndex: 1,
+      playerLives: maxLives,
+      dealerLives: maxLives,
+      gameOver: false,
+      matchStarted: false,
+      animating: false,
+      turn: "none",
+      playerDrewThisTurn: false,
+      dealerDrewThisTurn: false,
+      playerEndedCleanly: false,
+      dealerEndedCleanly: false,
+      playerSkillDrawnThisTurn: false,
+      dealerSkillDrawnThisTurn: false,
+      playerHoleRevealed: false,
+      dealerHoleRevealed: false,
+      playerView: "numbers",
+      targetScore: 21,
+      effects: {
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
+      },
+      matchLog: [],
+      currentRoundLog: null,
+      currentTurnLog: null,
+    };
+
+    const renderCache = {
+      player: "",
+      dealer: "",
+    };
+
+    function invalidateHandRenderCache() {
+      renderCache.player = "";
+      renderCache.dealer = "";
+    }
+
+    const elements = {
+      dealerCards: document.querySelector("#dealer-cards"),
+      playerCards: document.querySelector("#player-cards"),
+      dealerSkills: document.querySelector("#dealer-skills"),
+      playerViewTabs: document.querySelector("#player-view-tabs"),
+      playerNumberTab: document.querySelector("#player-number-tab"),
+      playerSkillTab: document.querySelector("#player-skill-tab"),
+      dealerScore: document.querySelector("#dealer-score"),
+      playerScore: document.querySelector("#player-score"),
+      message: document.querySelector("#message"),
+      hint: document.querySelector("#hint"),
+      recordButton: document.querySelector("#record-button"),
+      recordModal: document.querySelector("#record-modal"),
+      recordClose: document.querySelector("#record-close"),
+      recordBody: document.querySelector("#record-body"),
+      ruleButton: document.querySelector("#rule-button"),
+      rulesModal: document.querySelector("#rules-modal"),
+      rulesClose: document.querySelector("#rules-close"),
+      storyModal: document.querySelector("#story-modal"),
+      storyPanel: document.querySelector("#story-panel"),
+      storyImage: document.querySelector("#story-image"),
+      storyCounter: document.querySelector("#story-counter"),
+      storySkip: document.querySelector("#story-skip"),
+      storyNext: document.querySelector("#story-next"),
+      storyProgress: document.querySelector("#story-progress"),
+      dealButton: document.querySelector("#deal-button"),
+      hitButton: document.querySelector("#hit-button"),
+      standButton: document.querySelector("#stand-button"),
+      playerLives: document.querySelector("#player-lives"),
+      dealerLives: document.querySelector("#dealer-lives"),
+      playerTurnClock: document.querySelector("#player-turn-clock"),
+      dealerTurnClock: document.querySelector("#dealer-turn-clock"),
+      playerZone: document.querySelector("#player-zone"),
+      dealerZone: document.querySelector("#dealer-zone"),
+    };
+
+    const storyScenes = Array.from({ length: 5 }, (_, index) => {
+      const sceneNumber = index + 1;
+      return {
+        label: `剧情序章第${sceneNumber}幕`,
+        imageCandidates: imageExtensions.map(extension => `img/story-${sceneNumber}.${extension}`),
+      };
+    });
+    let storyIndex = 0;
+
+    elements.dealButton.addEventListener("click", startRound);
+    elements.hitButton.addEventListener("click", playerHit);
+    elements.standButton.addEventListener("click", endPlayerTurn);
+    elements.storyNext.addEventListener("click", nextStoryScene);
+    elements.storySkip.addEventListener("click", finishStoryIntro);
+    elements.recordButton.addEventListener("click", () => openRecordModal());
+    elements.recordClose.addEventListener("click", () => closeRecordModal());
+    elements.recordModal.addEventListener("click", event => {
+      if (event.target === elements.recordModal) closeRecordModal();
+    });
+    elements.ruleButton.addEventListener("click", () => openRulesModal());
+    elements.rulesClose.addEventListener("click", () => closeRulesModal());
+    elements.rulesModal.addEventListener("click", event => {
+      if (event.target === elements.rulesModal) closeRulesModal();
+    });
+    document.addEventListener("keydown", event => {
+      if (event.key === "Escape" && !elements.storyModal.hidden) finishStoryIntro();
+      else if (event.key === "Escape" && !elements.recordModal.hidden) closeRecordModal();
+      else if (event.key === "Escape" && !elements.rulesModal.hidden) closeRulesModal();
+      else if ((event.key === "Enter" || event.key === " ") && !elements.storyModal.hidden) {
+        event.preventDefault();
+        nextStoryScene();
+      }
+    });
+    elements.playerViewTabs.addEventListener("click", event => {
+      const button = event.target.closest(".hand-tab");
+      if (!button) return;
+      state.playerView = button.dataset.view;
+      render();
+    });
+
+    elements.playerCards.addEventListener("click", event => {
+      const shell = event.target.closest(".skill-card-shell");
+      if (!shell || state.playerView !== "skills") return;
+      const skill = state.playerSkills.find(card => card.id === shell.dataset.skillId);
+      if (skill) inspectSkill(skill);
+    });
+
+    preloadDeckImages();
+    loadAppIcon();
+    openStoryModal();
+    render();
+
+    function createDeck() {
+      return numberRanks.map(rank => {
+        const label = rank;
+        const imageCandidates = imageExtensions.map(extension => `img/${label}.${extension}`);
+        return {
+          rank,
+          value: Number(rank),
+          image: imageCandidates[0],
+          imageCandidates,
+          label: `${rank}点`,
+        };
+      });
+    }
+
+    function createSkillDeck() {
+      return [
+        ["peek", "透视", "让对手的隐藏牌翻至正面展示。"],
+        ["predict", "预判", "提前查看下一次要摸到的数字牌。"],
+        ["doublePredict", "预判的预判", "查看牌堆顶部2张数字牌，并可调换顺序。"],
+        ["reroll", "改运", "废弃1张自己明牌数字牌，重新抽1张数字牌。"],
+        ["lucky", "强运", "抽一张当前最有利的数字牌。"],
+        ["swap", "换牌", "双方随机交换一张明牌数字牌。"],
+        ["noCheat", "别出老千", "对手下个回合不能发动技能牌。"],
+        ["fate", "改命", "本回合抽牌后若爆牌，抽到的数字牌废弃。"],
+        ["seeThrough", "识破", "对方下次发动技能牌失效。"],
+        ["destroy", "破坏", "下次对手抽取的数字牌直接废弃。"],
+        ["gift", "赠品", "对手下次抽牌优先抽到8。"],
+        ["godHand", "神之一手", "下次自己摸牌一定摸到数字牌1。"],
+        ["deadly28", "致命28点", "本小局改为接近28点者获胜。"],
+        ["force", "强势", "下个回合，对方必须选择要牌。"],
+      ].map(([id, name, effect]) => ({
+        id,
+        name,
+        effect,
+        label: name,
+        imageCandidates: imageExtensions.map(extension => `img/${name}.${extension}`),
+      }));
+    }
+
+    function dealInitialSkillCards() {
+      const skills = [];
+      while (skills.length < 2 && state.skillDeck.length) {
+        skills.push(state.skillDeck.pop());
+      }
+      return skills;
+    }
+
+    function preloadDeckImages() {
+      [
+        ...createDeck().flatMap(card => card.imageCandidates.slice(0, 4)),
+        ...createSkillDeck().flatMap(card => card.imageCandidates.slice(0, 4)),
+        ...storyScenes.flatMap(scene => scene.imageCandidates.slice(0, 4)),
+        ...numberBackImageCandidates,
+        ...skillBackImageCandidates,
+      ].forEach(src => {
+        const image = new Image();
+        image.src = src;
+      });
+    }
+
+    function loadAppIcon() {
+      const icon = document.querySelector("#app-icon");
+      const fallback = document.querySelector("#logo-fallback");
+      const candidates = [
+        "img/icon.png",
+        "img/icon.jpg",
+        "img/icon.jpeg",
+        "img/致命21点.png",
+        "img/致命21点.jpg",
+        "img/致命21点icon.png",
+        "img/致命21点icon.jpg",
+        "img/图标.png",
+        "img/图标.jpg",
+        "icon.png",
+        "icon.jpg",
+        ...numberBackImageCandidates,
+        ...skillBackImageCandidates,
+      ];
+      let index = 0;
+      const tryNext = () => {
+        if (index >= candidates.length) return;
+        icon.src = candidates[index];
+        index += 1;
+      };
+      icon.addEventListener("load", () => {
+        icon.hidden = false;
+        fallback.hidden = true;
+      });
+      icon.addEventListener("error", tryNext);
+      tryNext();
+    }
+
+    function shuffle(deck) {
+      const shuffled = [...deck];
+      for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = secureRandomInt(i + 1);
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+      }
+      return shuffled;
+    }
+
+    function secureRandomInt(maxExclusive) {
+      const limit = Math.floor(0x100000000 / maxExclusive) * maxExclusive;
+      const value = new Uint32Array(1);
+      do {
+        crypto.getRandomValues(value);
+      } while (value[0] >= limit);
+      return value[0] % maxExclusive;
+    }
+
+    async function startRound() {
+      if (state.gameOver) resetMatch();
+      if (state.roundActive || state.animating) return;
+
+      state.animating = true;
+      state.turn = "none";
+      state.deck = shuffle(createDeck());
+      if (!state.matchStarted) {
+        state.skillDeck = shuffle(createSkillDeck());
+        state.playerSkills = dealInitialSkillCards();
+        state.dealerSkills = dealInitialSkillCards();
+        state.matchStarted = true;
+      }
+      state.player = [];
+      state.dealer = [];
+      invalidateHandRenderCache();
+      state.dealerHidden = true;
+      state.playerHoleRevealed = false;
+      state.dealerHoleRevealed = false;
+      state.playerView = "numbers";
+      state.targetScore = 21;
+      resetEffects();
+      resetTurnFlags();
+      state.playerEndedCleanly = false;
+      state.dealerEndedCleanly = false;
+      setMessage("发牌中", "发牌后可切换【技能牌】查看或使用", true);
+      render();
+
+      const initialDeal = [
+        { owner: "player", card: drawNumberCard(), hidden: false },
+        { owner: "dealer", card: drawNumberCard(), hidden: false },
+        { owner: "player", card: drawNumberCard(), hidden: false },
+        { owner: "dealer", card: drawNumberCard(), hidden: true },
+      ];
+
+      for (const deal of initialDeal) {
+        await dealCardToTable(deal.card, deal.hidden, deal.owner);
+        state[deal.owner].push(deal.card);
+        render();
+        await wait(150);
+      }
+      startRoundLog(initialDeal);
+
+      state.roundActive = true;
+      state.animating = false;
+      state.effects.dealer.blockSkills = false;
+      state.turn = "player";
+      resetTurnFlags();
+      startTurnLog();
+      await maybeGrantTurnSkill("player");
+      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽数字牌也可以发动技能牌，点结束则切换庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
+
+      render();
+    }
+
+    async function playerHit() {
+      if (!state.roundActive || state.animating || state.turn !== "player" || state.playerDrewThisTurn) return;
+      state.animating = true;
+      if (state.playerView !== "numbers") {
+        state.playerView = "numbers";
+        invalidateHandRenderCache();
+        render();
+      } else {
+        updateControlsOnly();
+      }
+
+      const card = drawNumberCardFor("player");
+      if (!card) {
+        settleIfNumberDeckEmpty();
+        return;
+      }
+      await dealCardToTable(card, false, "player");
+      addRecord("player", `玩家选择“要牌”，抽到数字牌“${card.rank}”`);
+      flushForcedDrawFailure("player", card);
+      await resolveDrawnNumberCard("player", card);
+      state.effects.player.mustHit = false;
+      state.playerDrewThisTurn = true;
+      state.playerEndedCleanly = false;
+      state.animating = false;
+
+      setMessage("我的决策", "本回合已抽1张数字牌，要牌按钮已锁定；即使21点或爆牌，也可继续使用技能牌，或点击“结束”。", true);
+      render();
+    }
+
+    async function endPlayerTurn() {
+      if (!state.roundActive || state.animating || state.turn !== "player") return;
+      if (state.effects.player.mustHit && !state.playerDrewThisTurn && state.deck.length > 0) {
+        setMessage("强势压制", "你必须先选择“要牌”，才能点击“结束”。", true);
+        addRecord("player", "因技能牌“强势”效果，玩家本回合必须先要牌");
+        return;
+      }
+      state.animating = true;
+      state.turn = "dealer";
+      state.playerEndedCleanly = !state.playerDrewThisTurn;
+      addRecord("player", "玩家选择“结束”");
+      state.effects.player.blockSkills = false;
+      render();
+      if (settleIfNumberDeckEmpty()) return;
+      await runDealerTurn();
+    }
+
+    async function runDealerTurn() {
+      state.dealerDrewThisTurn = false;
+      state.dealerSkillDrawnThisTurn = false;
+      state.dealerEndedCleanly = false;
+
+      if (!state.effects.dealer.mustHit && handValue(state.dealer).total >= state.targetScore) {
+        await showDealerDecision("庄家选择停牌");
+        addRecord("dealer", "庄家选择“结束”");
+        state.dealerEndedCleanly = true;
+      } else {
+        await maybeGrantTurnSkill("dealer");
+        if (handValue(state.dealer).total < state.targetScore) await maybeDealerUseSkill();
+        if (settleIfNumberDeckEmpty()) return;
+      }
+
+      if (!state.dealerEndedCleanly) {
+        if (state.effects.dealer.mustHit || dealerWantsCard()) {
+          const card = drawNumberCardFor("dealer");
+          if (!card) {
+            await showDealerDecision("庄家选择停牌");
+            addRecord("dealer", "数字牌牌堆已空，庄家选择“结束”");
+            state.effects.dealer.mustHit = false;
+            state.dealerEndedCleanly = true;
+            render();
+          } else {
+          await showDealerDecision("庄家选择要牌");
+          await dealCardToTable(card, true, "dealer");
+          addRecord("dealer", `庄家选择“要牌”，抽到数字牌“${card.rank}”`);
+          flushForcedDrawFailure("dealer", card);
+          await resolveDrawnNumberCard("dealer", card);
+          state.effects.dealer.mustHit = false;
+          state.dealerDrewThisTurn = true;
+          state.dealerEndedCleanly = false;
+          render();
+          }
+        } else {
+          await showDealerDecision("庄家选择停牌");
+          addRecord("dealer", "庄家选择“结束”");
+          state.dealerEndedCleanly = true;
+        }
+      }
+
+      if (settleIfNumberDeckEmpty()) return;
+
+      if (state.playerEndedCleanly && state.dealerEndedCleanly) {
+        await startSettlementComparison();
+        return;
+      }
+
+      state.effects.dealer.blockSkills = false;
+      state.turn = "player";
+      resetTurnFlags();
+      startTurnLog();
+      await maybeGrantTurnSkill("player");
+      state.animating = false;
+      setMessage("我的决策", canUseSkills("player") ? "你的回合可以抽数字牌也可以发动技能牌，点结束则切换庄家。" : "本回合无法发动技能牌；你仍可抽1张数字牌或点击“结束”。", true);
+      render();
+    }
+
+
+    function resetEffects() {
+      state.effects = {
+        player: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
+        dealer: { blockSkills: false, counterSkill: false, destroyNextDraw: false, fateChange: false, forceRank: null, forceSkillName: "", forceSourceName: "", forceFailureNote: "", mustHit: false },
+      };
+    }
+
+    function canUseSkills(owner) {
+      return !state.effects[owner].blockSkills;
+    }
+
+    async function maybeGrantTurnSkill(owner) {
+      const actor = ownerName(owner);
+      if (!state.skillDeck.length) {
+        addRecord(owner, `${actor}50%概率未抽到技能牌（技能牌堆已空）`);
+        return;
+      }
+      if (secureRandomInt(100) >= turnSkillDrawChance * 100) {
+        addRecord(owner, `${actor}50%概率未抽到技能牌`);
+        return;
+      }
+      const card = state.skillDeck.pop();
+      addRecord(owner, owner === "dealer" ? `${actor}50%概率抽到1张技能牌` : `${actor}50%概率抽到1张技能牌“${card.name}”`);
+      if (owner === "player") {
+        setMessage("获得技能牌", "你获得了1张随机技能牌。", true);
+        await showcaseCard(card, { alt: `获得技能牌${card.name}`, caption: "你获得一张技能牌", holdMs: 4000 });
+      } else {
+        setMessage("庄家获得1张技能牌", "庄家把新技能牌加入手牌，具体内容仍然保密。", true);
+        await wait(900);
+      }
+      state[`${owner}Skills`].push(card);
+      render();
+      await wait(300);
+    }
+
+    async function usePlayerSkill(skillId) {
+      if (!state.roundActive || state.animating || state.turn !== "player") return;
+      const index = state.playerSkills.findIndex(card => card.id === skillId);
+      if (index < 0) return;
+      if (!canUseSkills("player")) {
+        setMessage("我的决策", "本回合无法发动技能牌。", true);
+        return;
+      }
+      state.animating = true;
+      const [skill] = state.playerSkills.splice(index, 1);
+      await activateSkill("player", skill);
+      state.animating = false;
+      setMessage("我的决策", "你可以继续使用技能牌，或抽1张数字牌，或点击“结束”。", true);
+      render();
+    }
+
+    async function maybeDealerUseSkill() {
+      if (!state.dealerSkills.length || !canUseSkills("dealer") || secureRandomInt(100) >= 45) return;
+      const index = chooseDealerSkillIndex();
+      if (index < 0) return;
+      const [skill] = state.dealerSkills.splice(index, 1);
+      await activateSkill("dealer", skill);
+      render();
+    }
+
+    function chooseDealerSkillIndex() {
+      const preferred = ["deadly28", "lucky", "godHand", "force", "peek", "destroy", "gift", "noCheat", "fate", "swap"];
+      for (const id of preferred) {
+        const index = state.dealerSkills.findIndex(card => card.id === id);
+        if (index >= 0) return index;
+      }
+      return state.dealerSkills.length ? 0 : -1;
+    }
+
+    async function activateSkill(owner, skill) {
+      const opponent = owner === "player" ? "dealer" : "player";
+      if (state.effects[owner].counterSkill) {
+        state.effects[owner].counterSkill = false;
+        setMessage(`${skill.name}发动失败`, `因“识破”效果，【${skill.name}】技能牌发动失败。`, true);
+        addRecord(owner, `${ownerName(owner)}发动技能牌“${skill.name}”，因识破效果发动失败`);
+        await wait(1500);
+        return;
+      }
+      await showSkillCard(owner, skill);
+      addRecord(owner, `${ownerName(owner)}发动技能牌“${skill.name}”`);
+      switch (skill.id) {
+        case "peek":
+          await revealOpponentHole(owner, opponent);
+          setMessage("透视成功", `${ownerName(owner)}看穿了对手的隐藏牌。`, true);
+          break;
+        case "predict":
+          await previewTopCards(1);
+          break;
+        case "doublePredict":
+          await previewTopCards(2, owner === "player");
+          break;
+        case "reroll":
+          await rerollVisibleCard(owner);
+          break;
+        case "lucky":
+          await drawBestCard(owner);
+          break;
+        case "swap":
+          await swapRandomVisibleCards();
+          break;
+        case "noCheat":
+          state.effects[opponent].blockSkills = true;
+          setMessage("别出老千", `${ownerName(opponent)}下个回合无法发动技能牌。`, true);
+          break;
+        case "fate":
+          state.effects[owner].fateChange = true;
+          setMessage("改命", `${ownerName(owner)}本回合抽牌若爆牌，抽到的数字牌会废弃。`, true);
+          break;
+        case "seeThrough":
+          state.effects[opponent].counterSkill = true;
+          setMessage("识破", `${ownerName(opponent)}下次发动技能牌会失效。`, true);
+          break;
+        case "destroy":
+          state.effects[opponent].destroyNextDraw = true;
+          setMessage("破坏", `${ownerName(opponent)}下次抽取的数字牌会直接废弃。`, true);
+          break;
+        case "gift":
+          await setForcedRank(opponent, "8", "赠品", "", owner);
+          break;
+        case "godHand":
+          await setForcedRank(owner, "1", "神之一手", `${ownerName(owner)}下次抽牌将摸到数字牌1。`, owner);
+          break;
+        case "deadly28":
+          state.targetScore = 28;
+          setMessage("致命28点", "本小局改为接近28点者获胜，超过28点视为爆牌。", true);
+          addRecord(owner, `${ownerName(owner)}发动“致命28点”成功，本小局目标点数改为28点`);
+          break;
+        case "force":
+          state.effects[opponent].mustHit = true;
+          setMessage("强势", `${ownerName(opponent)}下个回合必须先选择“要牌”。`, true);
+          addRecord(owner, `${ownerName(opponent)}下个回合必须先选择“要牌”`);
+          break;
+      }
+      render();
+      await wait(900);
+    }
+
+    function ownerName(owner) {
+      return owner === "player" ? "玩家" : "庄家";
+    }
+
+    async function showSkillCard(owner, skill) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const stack = document.createElement("div");
+        const caption = document.createElement("div");
+        const card = document.createElement("div");
+        const img = document.createElement("img");
+        overlay.className = "skill-showcase";
+        stack.className = "skill-showcase-stack";
+        caption.className = "showcase-caption";
+        card.className = "skill-showcase-card";
+        caption.textContent = `${ownerName(owner)}发动了技能牌`;
+        img.alt = skill.name;
+        setResilientImage(img, skill.imageCandidates, skill.name);
+        card.append(img);
+        stack.append(caption, card);
+        overlay.appendChild(stack);
+        document.body.appendChild(overlay);
+        const holdMs = 4000;
+        setTimeout(() => stack.classList.add("ash-out"), holdMs);
+        setTimeout(() => {
+          overlay.remove();
+          resolve();
+        }, holdMs + 900);
+      });
+    }
+
+    async function revealOpponentHole(owner, opponent) {
+      const hand = state[opponent];
+      const holeIndex = opponent === "dealer" ? 1 : state.playerHoleIndex;
+      const holeCard = hand[holeIndex];
+      if (!holeCard) return;
+      await showcaseCard(holeCard, { alt: `${ownerName(owner)}透视${ownerName(opponent)}隐藏牌` });
+      state[`${opponent}HoleRevealed`] = true;
+      if (opponent === "dealer") state.dealerHidden = false;
+      render();
+    }
+
+    async function previewTopCards(count, allowSwap = false) {
+      const cards = state.deck.slice(-count).reverse();
+      if (!cards.length) {
+        setMessage(count === 1 ? "预判" : "预判的预判", "牌堆为空。", true);
+        await wait(1000);
+        return;
+      }
+      if (count === 1) {
+        setMessage("预判", `牌堆第一张：${cards[0].label}`, true);
+        await showcaseCard(cards[0], { alt: `预判${cards[0].label}` });
+        await wait(600);
+        return;
+      }
+      if (allowSwap && cards.length === 2) {
+        await showDoublePredictOverlay(cards);
+        return;
+      }
+      setMessage("预判的预判", cards.map((card, index) => `牌堆第${index + 1}张：${card.label}`).join("；"), true);
+      await wait(2500);
+    }
+
+    function showDoublePredictOverlay(cards) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const panel = document.createElement("div");
+        const title = document.createElement("div");
+        const cardRow = document.createElement("div");
+        const done = document.createElement("button");
+        let swapped = false;
+        let dragIndex = null;
+
+        overlay.className = "predict-overlay";
+        panel.className = "predict-panel";
+        title.className = "predict-title";
+        cardRow.className = "predict-cards";
+        done.className = "inspect-action";
+        done.type = "button";
+        title.textContent = "预判的预判";
+        done.textContent = "调整完毕";
+
+        const renderPreview = () => {
+          cardRow.innerHTML = "";
+          const display = swapped ? [cards[1], cards[0]] : cards;
+          display.forEach((card, index) => {
+            const item = document.createElement("div");
+            const img = document.createElement("img");
+            const label = document.createElement("div");
+            item.className = "predict-item";
+            item.draggable = true;
+            item.dataset.index = index;
+            img.alt = `${index === 0 ? "牌堆第一张" : "牌堆第二张"}${card.label}`;
+            img.draggable = false;
+            label.className = "predict-label";
+            label.textContent = index === 0 ? "牌堆第一张" : "牌堆第二张";
+            setResilientImage(img, card.imageCandidates, img.alt);
+            item.append(img, label);
+            item.addEventListener("click", () => { swapped = !swapped; renderPreview(); });
+            item.addEventListener("dragstart", event => { dragIndex = index; item.classList.add("dragging"); event.dataTransfer.effectAllowed = "move"; });
+            item.addEventListener("dragend", () => item.classList.remove("dragging"));
+            item.addEventListener("dragover", event => event.preventDefault());
+            item.addEventListener("drop", event => {
+              event.preventDefault();
+              if (dragIndex !== null && dragIndex !== index) {
+                swapped = !swapped;
+                renderPreview();
+              }
+              dragIndex = null;
+            });
+            cardRow.appendChild(item);
+          });
+        };
+
+        done.addEventListener("click", async () => {
+          if (swapped) {
+            const top = state.deck.pop();
+            const second = state.deck.pop();
+            state.deck.push(top, second);
+          }
+          overlay.remove();
+          setMessage("调整完毕", swapped ? "牌堆顶部两张数字牌已调换顺序。" : "牌堆顶部两张数字牌保持原顺序。", true);
+          await wait(700);
+          resolve();
+        });
+
+        renderPreview();
+        panel.append(title, cardRow, done);
+        overlay.appendChild(panel);
+        document.body.appendChild(overlay);
+      });
+    }
+
+    async function rerollVisibleCard(owner) {
+      const hand = state[owner];
+      const candidates = hand.map((card, index) => ({ card, index })).filter(({ index }) => !(owner === "dealer" && index === 1 && !state.dealerHoleRevealed) && !(owner === "player" && index === state.playerHoleIndex && !state.playerHoleRevealed));
+      if (!candidates.length) {
+        setMessage("改运失败", "没有可以废弃的明牌数字牌。", true);
+        await wait(1200);
+        return;
+      }
+      const chosen = owner === "player" ? await chooseRerollCardOverlay(candidates) : candidates[secureRandomInt(candidates.length)];
+      if (!chosen) return;
+      hand.splice(chosen.index, 1);
+      invalidateHandRenderCache();
+      render();
+      addRecord(owner, `${ownerName(owner)}因“改运”废弃数字牌“${chosen.card.rank}”`);
+      setMessage("改运", `${ownerName(owner)}废弃了${chosen.card.label}，重新抽取1张数字牌。`, true);
+      await showDestroyedCard(chosen.card, { hidden: false, alt: `${ownerName(owner)}改运废弃${chosen.card.label}` });
+      const newCard = drawNumberCardFor(owner);
+      if (!newCard) {
+        setMessage("改运抽牌失败", "改运抽牌失败", true);
+        addRecord(owner, `${ownerName(owner)}改运抽牌失败，数字牌牌堆已空`);
+        await wait(1200);
+        return;
+      }
+      await dealCardToTable(newCard, owner === "dealer", owner);
+      addRecord(owner, `${ownerName(owner)}因“改运”重新抽到数字牌“${newCard.rank}”`);
+      flushForcedDrawFailure(owner);
+      await resolveDrawnNumberCard(owner, newCard);
+      render();
+    }
+
+    function chooseRerollCardOverlay(candidates) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const panel = document.createElement("div");
+        const title = document.createElement("div");
+        const cardRow = document.createElement("div");
+        const done = document.createElement("button");
+        let selected = null;
+
+        overlay.className = "predict-overlay";
+        panel.className = "predict-panel";
+        title.className = "predict-title";
+        cardRow.className = "predict-cards";
+        done.className = "inspect-action";
+        done.type = "button";
+        done.disabled = true;
+        title.textContent = "改运：选择要废弃的数字牌";
+        done.textContent = "确定";
+
+        candidates.forEach(candidate => {
+          const item = document.createElement("div");
+          const img = document.createElement("img");
+          const label = document.createElement("div");
+          item.className = "predict-item";
+          img.alt = `选择废弃${candidate.card.label}`;
+          img.draggable = false;
+          label.className = "predict-label";
+          label.textContent = candidate.card.label;
+          setResilientImage(img, candidate.card.imageCandidates, img.alt);
+          item.append(img, label);
+          item.addEventListener("click", () => {
+            selected = candidate;
+            cardRow.querySelectorAll(".predict-item").forEach(node => node.classList.remove("selected"));
+            item.classList.add("selected");
+            done.disabled = false;
+          });
+          cardRow.appendChild(item);
+        });
+
+        done.addEventListener("click", () => {
+          if (!selected) return;
+          overlay.remove();
+          resolve(selected);
+        });
+
+        panel.append(title, cardRow, done);
+        overlay.appendChild(panel);
+        document.body.appendChild(overlay);
+      });
+    }
+
+    async function drawBestCard(owner) {
+      const total = handValue(state[owner]).total;
+      let bestIndex = -1;
+      let bestScore = Infinity;
+      state.deck.forEach((card, index) => {
+        const value = cardValueForBust(card);
+        const after = total + value;
+        const target = state.targetScore;
+        const score = after <= target ? target - after : after - target + 30;
+        if (score < bestScore) {
+          bestScore = score;
+          bestIndex = index;
+        }
+      });
+      if (bestIndex < 0) return;
+      const [card] = state.deck.splice(bestIndex, 1);
+      setMessage("强运", `${ownerName(owner)}抽取了最有利的数字牌。`, true);
+      await showcaseCard(card, { hidden: owner === "dealer", alt: `${ownerName(owner)}强运抽牌` });
+      await resolveDrawnNumberCard(owner, card);
+      addRecord(owner, `${ownerName(owner)}因“强运”抽到数字牌“${card.rank}”`);
+    }
+
+    async function swapRandomVisibleCards() {
+      const playerOptions = state.player.map((card, index) => ({ card, index })).filter(({ index }) => index !== state.playerHoleIndex || state.playerHoleRevealed);
+      const dealerOptions = state.dealer.map((card, index) => ({ card, index })).filter(({ index }) => index !== 1 || state.dealerHoleRevealed);
+      if (!playerOptions.length || !dealerOptions.length) {
+        setMessage("换牌失败", "双方没有足够的明牌数字牌可交换。", true);
+        await wait(1200);
+        return;
+      }
+      const p = playerOptions[secureRandomInt(playerOptions.length)];
+      const d = dealerOptions[secureRandomInt(dealerOptions.length)];
+      setMessage("换牌", `双方交换了${p.card.label}与${d.card.label}。`, true);
+      addRecord("player", `双方因“换牌”交换了玩家数字牌“${p.card.rank}”和庄家数字牌“${d.card.rank}”`);
+      addRecord("dealer", `双方因“换牌”交换了玩家数字牌“${p.card.rank}”和庄家数字牌“${d.card.rank}”`);
+      await animateSwapCards(p.card, d.card);
+      [state.player[p.index], state.dealer[d.index]] = [d.card, p.card];
+      render();
+      await wait(450);
+    }
+
+    function animateSwapCards(playerCard, dealerCard) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const playerFlyer = document.createElement("div");
+        const dealerFlyer = document.createElement("div");
+        const playerImg = document.createElement("img");
+        const dealerImg = document.createElement("img");
+        overlay.className = "swap-overlay";
+        playerFlyer.className = "swap-flight swap-to-dealer";
+        dealerFlyer.className = "swap-flight swap-to-player";
+        playerImg.alt = `玩家交换${playerCard.label}`;
+        dealerImg.alt = `庄家交换${dealerCard.label}`;
+        playerImg.draggable = false;
+        dealerImg.draggable = false;
+        setResilientImage(playerImg, playerCard.imageCandidates, playerImg.alt);
+        setResilientImage(dealerImg, dealerCard.imageCandidates, dealerImg.alt);
+        playerFlyer.appendChild(playerImg);
+        dealerFlyer.appendChild(dealerImg);
+        overlay.append(playerFlyer, dealerFlyer);
+        document.body.appendChild(overlay);
+        setTimeout(() => {
+          overlay.remove();
+          resolve();
+        }, 1200);
+      });
+    }
+
+    async function setForcedRank(owner, rank, skillName, successText = "", sourceOwner = owner) {
+      const effect = state.effects[owner];
+      effect.forceRank = rank;
+      effect.forceSkillName = skillName;
+      effect.forceSourceName = ownerName(sourceOwner);
+      effect.forceFailureNote = "";
+      if (state.deck.some(card => card.rank === rank)) {
+        setMessage(skillName, successText || `${ownerName(owner)}下次抽牌将优先抽到${rank}。`, true);
+        addRecord(sourceOwner, `${skillName}生效，${ownerName(owner)}下次抽牌优先抽到数字牌“${rank}”`);
+      } else {
+        setMessage(skillName, `${skillName}已发动；若目标数字牌不在牌堆中，下次抽牌时会发动失败。`, true);
+        addRecord(sourceOwner, `${skillName}已发动，等待${ownerName(owner)}下次抽牌时结算`);
+      }
+      await wait(1200);
+    }
+
+    async function resolveDrawnNumberCard(owner, card) {
+      const effect = state.effects[owner];
+      if (effect.destroyNextDraw) {
+        effect.destroyNextDraw = false;
+        await showDestroyedCard(card, { hidden: owner === "dealer", alt: `${ownerName(owner)}抽到的${card.label}被破坏` });
+        setMessage("数字牌被破坏", `${ownerName(owner)}抽到的${card.label}被废弃。`, true);
+        addRecord(owner, `因对手技能牌“破坏”效果，数字牌“${card.rank}”被废弃`);
+        await wait(1200);
+        return;
+      }
+      const hand = state[owner];
+      if (effect.fateChange && handValue([...hand, card]).total > state.targetScore) {
+        effect.fateChange = false;
+        setMessage("改命生效", `${ownerName(owner)}抽到的${card.label}超过${state.targetScore}点导致爆牌，已废弃。`, true);
+        addRecord(owner, `因技能牌“改命”效果，数字牌“${card.rank}”被废弃`);
+        await wait(1000);
+        return;
+      }
+      effect.fateChange = false;
+      hand.push(card);
+    }
+
+    function compareTotals(playerTotal, dealerTotal) {
+      const target = state.targetScore;
+      const playerBust = playerTotal > target;
+      const dealerBust = dealerTotal > target;
+      if (!playerBust && dealerBust) return 1;
+      if (playerBust && !dealerBust) return -1;
+      if (playerBust && dealerBust) return Math.abs(dealerTotal - target) - Math.abs(playerTotal - target);
+      return Math.abs(dealerTotal - target) - Math.abs(playerTotal - target);
+    }
+
+    function resetTurnFlags() {
+      state.playerDrewThisTurn = false;
+      state.dealerDrewThisTurn = false;
+      state.playerSkillDrawnThisTurn = false;
+      state.dealerSkillDrawnThisTurn = false;
+    }
+
+    function settleIfNumberDeckEmpty() {
+      if (state.deck.length > 0 || !state.roundActive) return false;
+      setMessage("数字牌摸完", "牌堆里的11张数字牌已经全部出现；双方都结束且不再要牌后结算。", true);
+      state.animating = false;
+      render();
+      return false;
+    }
+
+    async function startSettlementComparison() {
+      state.turn = "none";
+      setMessage("双方均已停牌，开始结算", "正在翻开隐藏牌并比较双方点数……", true);
+      render();
+      await wait(3000);
+      compareHands();
+      state.animating = false;
+      render();
+    }
+
+    function compareHands() {
+      state.turn = "none";
+      state.dealerHidden = false;
+      const playerTotal = handValue(state.player).total;
+      const dealerTotal = handValue(state.dealer).total;
+      const result = compareTotals(playerTotal, dealerTotal);
+      const targetHint = state.targetScore === 28 ? "（致命28点规则）" : "";
+      const resultText = result > 0
+        ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，${targetHint}庄家扣1颗生命。`
+        : result < 0
+          ? `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，${targetHint}你扣1颗生命。`
+          : `你 ${playerTotal} 点，庄家 ${dealerTotal} 点，${targetHint}平局，不扣生命。`;
+      addRoundResult(resultText);
+      if (result > 0) finishRound("win", resultText, false);
+      else if (result < 0) finishRound("lose", resultText, false);
+      else finishRound("push", resultText, false);
+    }
+
+    function dealerWantsCard() {
+      const dealerTotal = handValue(state.dealer).total;
+      const playerTotal = handValue(state.player).total;
+      const target = state.targetScore;
+      if (dealerTotal > target || Math.abs(dealerTotal - target) <= Math.abs(playerTotal - target)) return false;
+      if (dealerTotal <= Math.floor(target / 2)) return true;
+
+      const bustCards = state.deck.filter(card => dealerTotal + cardValueForBust(card) > target).length;
+      const bustRisk = bustCards / Math.max(state.deck.length, 1);
+      const gap = Math.abs(dealerTotal - target) - Math.abs(playerTotal - target);
+      return gap >= 4 || bustRisk < 0.42;
+    }
+
+    function cardValueForBust(card) {
+      return Number(card.rank);
+    }
+
+    function drawNumberCard() {
+      return state.deck.pop() || null;
+    }
+
+    function drawNumberCardFor(owner) {
+      const effect = state.effects[owner];
+      const forcedRank = effect.forceRank;
+      if (forcedRank) {
+        effect.forceRank = null;
+        const skillName = effect.forceSkillName || "技能牌";
+        const sourceName = effect.forceSourceName || ownerName(owner);
+        effect.forceSkillName = "";
+        effect.forceSourceName = "";
+        const index = state.deck.findIndex(card => card.rank === forcedRank);
+        if (index >= 0) return state.deck.splice(index, 1)[0];
+        const fallback = drawNumberCard();
+        if (fallback) {
+          effect.forceFailureTitle = skillName;
+          effect.forceFailureNote = `${sourceName}${skillName}发动失败，数字牌“${forcedRank}”已不在牌堆中，故${ownerName(owner)}抽到数字牌“${fallback.rank}”`;
+        }
+        return fallback;
+      }
+      return drawNumberCard();
+    }
+
+    function flushForcedDrawFailure(owner) {
+      const effect = state.effects[owner];
+      if (!effect.forceFailureNote) return;
+      addRecord(owner, effect.forceFailureNote);
+      setMessage(`${effect.forceFailureTitle || "技能牌"}发动失败`, effect.forceFailureNote, true);
+      effect.forceFailureNote = "";
+      effect.forceFailureTitle = "";
+    }
+
+    function handValue(hand) {
+      const total = hand.reduce((sum, card) => sum + Number(card.rank), 0);
+      return { total, softAces: 0 };
+    }
+
+    function isBlackjack(hand) {
+      return hand.length === 2 && handValue(hand).total === 21;
+    }
+
+    function finishRound(result, text, resetAnimation = true) {
+      state.roundActive = false;
+      state.turn = "none";
+      if (resetAnimation) state.animating = false;
+
+      if (result === "win") state.dealerLives = Math.max(0, state.dealerLives - 1);
+      if (result === "lose") state.playerLives = Math.max(0, state.playerLives - 1);
+
+      const className = result === "win" ? "win" : result === "lose" ? "lose" : "";
+      elements.message.className = `message ${className}`;
+
+      if (state.dealerLives === 0 || state.playerLives === 0) {
+        state.gameOver = true;
+        const finalText = state.dealerLives === 0 ? "整场胜利！庄家失去全部生命。" : "整场失败：你失去全部生命。";
+        setMessage(finalText, `${text} 点击“重新开始”开启一场新的三命对决。`, false);
+      } else {
+        setMessage(text, "", false);
+      }
+    }
+
+    function resetMatch() {
+      state.playerLives = maxLives;
+      state.dealerLives = maxLives;
+      state.gameOver = false;
+      state.matchStarted = false;
+      state.roundActive = false;
+      state.dealerHidden = true;
+      state.turn = "none";
+      resetTurnFlags();
+      state.playerEndedCleanly = false;
+      state.dealerEndedCleanly = false;
+      state.player = [];
+      state.dealer = [];
+      state.playerSkills = [];
+      state.dealerSkills = [];
+      invalidateHandRenderCache();
+      state.deck = [];
+      state.skillDeck = [];
+      state.playerView = "numbers";
+      state.targetScore = 21;
+      resetMatchLog();
+      resetEffects();
+      setMessage("新的一场开始", "发牌后可切换【技能牌】查看或使用", true);
+    }
+
+    function openStoryModal() {
+      storyIndex = 0;
+      updateStoryScene();
+      elements.storyModal.hidden = false;
+      document.body.classList.add("story-open");
+      elements.storyNext.focus({ preventScroll: true });
+    }
+
+    function nextStoryScene() {
+      if (storyIndex >= storyScenes.length - 1) {
+        finishStoryIntro();
+        return;
+      }
+      storyIndex += 1;
+      updateStoryScene();
+    }
+
+    function finishStoryIntro() {
+      elements.storyModal.hidden = true;
+      document.body.classList.remove("story-open");
+      openRulesModal();
+    }
+
+    function updateStoryScene() {
+      const scene = storyScenes[storyIndex];
+      elements.storyPanel.className = "story-frame";
+      elements.storyImage.alt = scene.label;
+      setResilientImage(elements.storyImage, scene.imageCandidates, scene.label);
+      elements.storyCounter.textContent = `第 ${storyIndex + 1} 幕 / 共 ${storyScenes.length} 幕`;
+      elements.storyNext.textContent = storyIndex === storyScenes.length - 1 ? "开始赌局" : "下一幕";
+      elements.storyProgress.innerHTML = "";
+      storyScenes.forEach((_, index) => {
+        const dot = document.createElement("span");
+        dot.className = `story-dot${index === storyIndex ? " active" : ""}`;
+        elements.storyProgress.appendChild(dot);
+      });
+    }
+
+
+    function openRecordModal() {
+      renderRecordLog();
+      elements.recordModal.hidden = false;
+      document.body.classList.add("rules-open");
+      elements.recordClose.focus({ preventScroll: true });
+    }
+
+    function closeRecordModal() {
+      elements.recordModal.hidden = true;
+      document.body.classList.remove("rules-open");
+    }
+
+    function renderRecordLog() {
+      elements.recordBody.innerHTML = "";
+      if (!state.matchLog.length) {
+        const empty = document.createElement("p");
+        empty.className = "record-empty";
+        empty.textContent = "大局开始后，这里会记录双方发牌、抽牌、技能牌和结束回合。";
+        elements.recordBody.appendChild(empty);
+        return;
+      }
+      state.matchLog.forEach(round => {
+        const section = document.createElement("section");
+        section.className = "record-round";
+        section.appendChild(createRecordHeading("h3", `一、第${chineseNumber(round.number)}局`));
+        section.appendChild(createRecordHeading("h4", "1、发牌阶段"));
+        section.appendChild(createRecordList(round.deal));
+        round.turns.forEach(turn => {
+          section.appendChild(createRecordHeading("h4", `${turn.number + 1}、第${chineseNumber(turn.number)}回合`));
+          section.appendChild(createRecordList([
+            `玩家决策：${turn.player.length ? turn.player.join("，") : "玩家暂未操作。"}`,
+            `庄家决策：${turn.dealer.length ? turn.dealer.join("，") : "庄家暂未操作。"}`,
+          ]));
+        });
+        if (round.result) {
+          section.appendChild(createRecordHeading("h4", "结算"));
+          section.appendChild(createRecordList([round.result]));
+        }
+        elements.recordBody.appendChild(section);
+      });
+    }
+
+    function createRecordHeading(tag, text) {
+      const heading = document.createElement(tag);
+      heading.textContent = text;
+      return heading;
+    }
+
+    function createRecordList(items) {
+      const list = document.createElement("ol");
+      items.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+      return list;
+    }
+
+    function resetMatchLog() {
+      state.matchLog = [];
+      state.currentRoundLog = null;
+      state.currentTurnLog = null;
+      if (elements.recordBody) renderRecordLog();
+    }
+
+    function startRoundLog(initialDeal) {
+      const playerCards = initialDeal.filter(item => item.owner === "player").map(item => item.card.label);
+      const dealerFirst = initialDeal.find(item => item.owner === "dealer" && !item.hidden)?.card.label || "一张明牌";
+      const round = {
+        number: state.matchLog.length + 1,
+        deal: [
+          `玩家摸到：数字牌“${playerCards[0]}”和“${playerCards[1]}”（己方盖牌）；技能牌${formatSkillNames(state.playerSkills)}。`,
+          `庄家摸到：数字牌“${dealerFirst}”和一张盖牌；${state.dealerSkills.length}张技能牌。`,
+        ],
+        turns: [],
+        result: "",
+      };
+      state.matchLog.push(round);
+      state.currentRoundLog = round;
+      state.currentTurnLog = null;
+    }
+
+    function startTurnLog() {
+      if (!state.currentRoundLog) return;
+      const turn = { number: state.currentRoundLog.turns.length + 1, player: [], dealer: [] };
+      state.currentRoundLog.turns.push(turn);
+      state.currentTurnLog = turn;
+    }
+
+    function addRecord(owner, text) {
+      if (!state.currentTurnLog) return;
+      state.currentTurnLog[owner].push(text);
+      if (!elements.recordModal.hidden) renderRecordLog();
+    }
+
+    function addRoundResult(text) {
+      if (!state.currentRoundLog) return;
+      state.currentRoundLog.result = text;
+      if (!elements.recordModal.hidden) renderRecordLog();
+    }
+
+    function formatSkillNames(skills) {
+      if (!skills.length) return "0张";
+      return skills.map(skill => `“${skill.name}”`).join("和");
+    }
+
+    function chineseNumber(value) {
+      return ["零", "一", "二", "三", "四", "五", "六", "七", "八", "九", "十"][value] || String(value);
+    }
+
+    function openRulesModal() {
+      elements.rulesModal.hidden = false;
+      document.body.classList.add("rules-open");
+      elements.rulesClose.focus({ preventScroll: true });
+    }
+
+    function closeRulesModal() {
+      elements.rulesModal.hidden = true;
+      document.body.classList.remove("rules-open");
+    }
+
+    function setMessage(message, hint, resetClass = true) {
+      if (resetClass) elements.message.className = "message";
+      elements.message.classList.remove("typing");
+      elements.message.textContent = message;
+      elements.hint.textContent = hint;
+    }
+
+    async function typeCenterMessage(message, hint = "", holdMs = 1400) {
+      elements.message.className = "message typing";
+      elements.message.textContent = "";
+      elements.hint.textContent = hint;
+      for (const char of message) {
+        elements.message.textContent += char;
+        await wait(95);
+      }
+      await wait(holdMs);
+      elements.message.classList.remove("typing");
+    }
+
+    function render() {
+      const playerSignature = state.playerView === "skills"
+        ? `skills:${state.playerSkills.map(skill => skill.id).join("|")}`
+        : handRenderSignature(state.player, false, "player", state.playerHoleIndex);
+      if (renderCache.player !== playerSignature) {
+        if (state.playerView === "skills") renderSkillHand(elements.playerCards, state.playerSkills);
+        else renderHand(elements.playerCards, state.player, false, "player", state.playerHoleIndex);
+        renderCache.player = playerSignature;
+      }
+
+      const dealerSignature = handRenderSignature(state.dealer, state.dealerHidden && !state.dealerHoleRevealed, "dealer");
+      if (renderCache.dealer !== dealerSignature) {
+        renderHand(elements.dealerCards, state.dealer, state.dealerHidden && !state.dealerHoleRevealed, "dealer");
+        renderCache.dealer = dealerSignature;
+      }
+
+      renderSkills();
+      updateControlsOnly();
+      updateOverflowIndicators();
+    }
+
+    function handRenderSignature(hand, hideSecondCard = false, owner = "player", playerHoleIndex = -1) {
+      const cards = hand.map((card, index) => {
+        const hidden = hideSecondCard && index === 1;
+        const playerHole = owner === "player" && index === playerHoleIndex && !state.playerHoleRevealed;
+        const revealedHole = (owner === "dealer" && index === 1 && state.dealerHoleRevealed) || (owner === "player" && index === playerHoleIndex && state.playerHoleRevealed);
+        return `${card.rank}:${hidden ? "H" : "V"}:${playerHole ? "P" : ""}:${revealedHole ? "R" : ""}`;
+      });
+      return `${owner}:${cards.join("|")}`;
+    }
+
+    function updateControlsOnly() {
+      elements.playerScore.textContent = state.player.length ? handValue(state.player).total : 0;
+      elements.dealerScore.textContent = state.dealer.length
+        ? state.dealerHidden ? visibleDealerScore() : handValue(state.dealer).total
+        : "?";
+
+      elements.dealButton.textContent = state.gameOver ? "重新开始" : state.player.length ? "下一局" : "发牌";
+      elements.standButton.textContent = "结束";
+      elements.dealButton.disabled = state.roundActive || state.animating;
+      elements.hitButton.disabled = !state.roundActive || state.animating || state.turn !== "player" || state.playerDrewThisTurn || state.deck.length === 0;
+      elements.standButton.disabled = !state.roundActive || state.animating || state.turn !== "player" || (state.effects.player.mustHit && !state.playerDrewThisTurn && state.deck.length > 0);
+      elements.recordButton.hidden = !state.matchStarted;
+      elements.recordButton.disabled = state.animating;
+      elements.ruleButton.hidden = !state.matchStarted;
+      elements.ruleButton.disabled = state.animating;
+
+      elements.playerLives.textContent = hearts(state.playerLives);
+      elements.dealerLives.textContent = hearts(state.dealerLives);
+      elements.playerTurnClock.classList.toggle("active", state.turn === "player");
+      elements.dealerTurnClock.classList.toggle("active", state.turn === "dealer");
+      elements.playerTurnClock.setAttribute("aria-hidden", state.turn === "player" ? "false" : "true");
+      elements.dealerTurnClock.setAttribute("aria-hidden", state.turn === "dealer" ? "false" : "true");
+    }
+
+    function updateOverflowIndicators() {
+      const update = container => {
+        const zone = container.closest(".zone");
+        if (!zone) return;
+        const visibleCardCount = container.querySelectorAll(".card-shell").length;
+        zone.classList.toggle("has-overflow", visibleCardCount > 4);
+      };
+      update(elements.dealerCards);
+      update(elements.playerCards);
+    }
+
+    function renderHand(container, hand, hideSecondCard = false, owner = "player", playerHoleIndex = -1) {
+      hand.forEach((card, index) => {
+        const hidden = hideSecondCard && index === 1;
+        const playerHole = owner === "player" && index === playerHoleIndex && !state.playerHoleRevealed;
+        const revealedHole = (owner === "dealer" && index === 1 && state.dealerHoleRevealed) || (owner === "player" && index === playerHoleIndex && state.playerHoleRevealed);
+        const key = `${owner}:${index}:${card.rank}:${hidden ? "H" : "V"}:${playerHole ? "P" : ""}:${revealedHole ? "R" : ""}`;
+        const current = container.children[index];
+        if (current?.dataset?.renderKey === key) return;
+        const shell = createNumberCardShell(card, { hidden, playerHole, revealedHole, owner });
+        shell.dataset.renderKey = key;
+        if (current) container.replaceChild(shell, current);
+        else container.appendChild(shell);
+      });
+      while (container.children.length > hand.length) {
+        container.lastElementChild.remove();
+      }
+    }
+
+    function createNumberCardShell(card, { hidden, playerHole, revealedHole, owner }) {
+      const shell = document.createElement("div");
+      const img = document.createElement("img");
+      shell.className = `card-shell ${owner}-card${hidden ? " hidden-card back-card" : ""}${playerHole ? " player-hole-card" : ""}${revealedHole ? " revealed-hole-card" : ""}`;
+      img.className = `card${hidden ? " card-back" : ""}`;
+      img.alt = hidden ? "庄家暗牌" : playerHole ? `${card.label}，己方盖牌` : card.label;
+      img.draggable = false;
+      setResilientImage(img, hidden ? numberBackImageCandidates : card.imageCandidates, img.alt);
+      shell.appendChild(img);
+      if (!hidden) {
+        shell.tabIndex = 0;
+        shell.setAttribute("role", "button");
+        shell.setAttribute("aria-label", `放大查看${card.label}`);
+        shell.addEventListener("click", () => inspectCard(card));
+        shell.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            inspectCard(card);
+          }
+        });
+      }
+      return shell;
+    }
+
+    function renderSkills() {
+      elements.playerNumberTab.classList.toggle("active", state.playerView === "numbers");
+      elements.playerSkillTab.classList.toggle("active", state.playerView === "skills");
+      elements.playerNumberTab.setAttribute("aria-pressed", state.playerView === "numbers");
+      elements.playerSkillTab.setAttribute("aria-pressed", state.playerView === "skills");
+      elements.dealerSkills.textContent = `技能牌数量：${state.dealerSkills.length}`;
+    }
+
+    function renderSkillHand(container, skills) {
+      container.innerHTML = "";
+      if (!skills.length) {
+        const empty = document.createElement("div");
+        empty.className = "empty-skill-hint";
+        empty.textContent = "当前没有技能牌";
+        container.appendChild(empty);
+        return;
+      }
+      skills.forEach(skill => {
+        const shell = document.createElement("div");
+        const img = document.createElement("img");
+        shell.className = "card-shell skill-card-shell";
+        shell.dataset.skillId = skill.id;
+        shell.tabIndex = 0;
+        shell.setAttribute("role", "button");
+        shell.setAttribute("aria-label", `查看技能牌${skill.name}`);
+        img.className = "card";
+        img.alt = skill.name;
+        img.draggable = false;
+        setResilientImage(img, skill.imageCandidates, skill.name);
+        shell.appendChild(img);
+        shell.addEventListener("keydown", event => {
+          if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            inspectSkill(skill);
+          }
+        });
+        container.appendChild(shell);
+      });
+    }
+
+    function showDealerDecision(decisionText) {
+      setMessage("庄家决策", decisionText, true);
+      render();
+      return wait(5000);
+    }
+
+    function dealCardToTable(card, hidden = false, owner = "player") {
+      return new Promise(resolve => {
+        const flyer = document.createElement("div");
+        const image = document.createElement("img");
+        const target = getDealTarget(owner);
+        flyer.className = `deal-flight deal-to-${owner}`;
+        flyer.style.setProperty("--start-x", `${window.innerWidth + target.width}px`);
+        flyer.style.setProperty("--start-y", `${Math.max(window.innerHeight * 0.42, 220)}px`);
+        flyer.style.setProperty("--mid-x", `${window.innerWidth * 0.52}px`);
+        flyer.style.setProperty("--mid-y", `${window.innerHeight * 0.5}px`);
+        flyer.style.setProperty("--end-x", `${target.x}px`);
+        flyer.style.setProperty("--end-y", `${target.y}px`);
+        flyer.style.width = `${target.width}px`;
+        image.alt = hidden ? "发出庄家暗牌" : `发出${card.label}`;
+        image.draggable = false;
+        if (hidden) image.classList.add("card-back");
+        setResilientImage(image, hidden ? numberBackImageCandidates : card.imageCandidates, image.alt);
+        flyer.appendChild(image);
+        document.body.appendChild(flyer);
+
+        const cleanup = () => {
+          flyer.remove();
+          resolve();
+        };
+        flyer.addEventListener("animationend", cleanup, { once: true });
+        setTimeout(cleanup, 1100);
+      });
+    }
+
+    function getDealTarget(owner) {
+      const container = owner === "dealer" ? elements.dealerCards : elements.playerCards;
+      const rect = container.getBoundingClientRect();
+      const existing = state[owner].length;
+      const sample = container.querySelector(".card-shell");
+      const fallbackWidth = Math.min(116, Math.max(78, window.innerWidth * 0.23));
+      const cardWidth = sample ? sample.getBoundingClientRect().width : fallbackWidth;
+      const gap = 12;
+      const padding = 8;
+      const x = Math.min(rect.left + padding + existing * (cardWidth + gap) + cardWidth / 2, rect.right - cardWidth / 2 - padding);
+      const y = rect.top + Math.min(rect.height * 0.52, cardWidth / 0.69 / 2 + 10);
+      return { x, y, width: cardWidth };
+    }
+
+    function showDestroyedCard(card, options = {}) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const shell = document.createElement("div");
+        const image = document.createElement("img");
+        const alt = options.alt || `${card.label}被破坏`;
+        overlay.className = "destroy-showcase";
+        shell.className = "destroy-card";
+        image.alt = alt;
+        image.draggable = false;
+        if (options.hidden) image.classList.add("card-back");
+        setResilientImage(image, options.hidden ? numberBackImageCandidates : card.imageCandidates, alt);
+        shell.appendChild(image);
+        overlay.appendChild(shell);
+        document.body.appendChild(overlay);
+
+        const cleanup = () => {
+          overlay.remove();
+          resolve();
+        };
+        shell.addEventListener("animationend", cleanup, { once: true });
+        setTimeout(cleanup, 1900);
+      });
+    }
+
+    function setResilientImage(img, candidates, fallbackText) {
+      let index = 0;
+      img.classList.remove("is-missing");
+      img.removeAttribute("aria-label");
+      const tryNext = () => {
+        if (index >= candidates.length) {
+          img.removeAttribute("src");
+          img.classList.add("is-missing");
+          img.alt = `${fallbackText}（图片加载失败）`;
+          img.setAttribute("aria-label", `图片加载失败：${fallbackText}`);
+          return;
+        }
+        img.src = candidates[index];
+        index += 1;
+      };
+      img.addEventListener("error", tryNext);
+      img.addEventListener("load", () => img.classList.remove("is-missing"), { once: true });
+      tryNext();
+    }
+
+    function inspectCard(card) {
+      const overlay = document.createElement("div");
+      const panel = document.createElement("div");
+      const image = document.createElement("img");
+      overlay.className = "inspect-overlay";
+      panel.className = "inspect-panel";
+      image.alt = `放大查看${card.label}`;
+      image.draggable = false;
+      setResilientImage(image, card.imageCandidates, image.alt);
+      panel.appendChild(image);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+      overlay.addEventListener("click", () => overlay.remove(), { once: true });
+    }
+
+    function inspectSkill(skill) {
+      const overlay = document.createElement("div");
+      const panel = document.createElement("div");
+      const image = document.createElement("img");
+      const action = document.createElement("button");
+      overlay.className = "inspect-overlay";
+      panel.className = "inspect-panel";
+      image.alt = `查看技能牌${skill.name}`;
+      image.draggable = false;
+      action.className = "inspect-action";
+      action.type = "button";
+      action.textContent = "发动技能牌";
+      action.disabled = !state.roundActive || state.animating || state.turn !== "player" || !canUseSkills("player");
+      if (action.disabled) action.title = "当前不能发动技能牌";
+      setResilientImage(image, skill.imageCandidates, skill.name);
+      panel.append(image, action);
+      overlay.appendChild(panel);
+      document.body.appendChild(overlay);
+      panel.addEventListener("click", event => event.stopPropagation());
+      overlay.addEventListener("click", () => overlay.remove(), { once: true });
+      action.addEventListener("click", () => {
+        if (action.disabled) return;
+        overlay.remove();
+        usePlayerSkill(skill.id);
+      });
+    }
+
+    function showcaseCard(card, options = {}) {
+      return new Promise(resolve => {
+        const overlay = document.createElement("div");
+        const stack = document.createElement("div");
+        const caption = document.createElement("div");
+        const showcase = document.createElement("div");
+        const front = document.createElement("img");
+        const back = document.createElement("img");
+        const alt = options.alt || `抽到${card.label}`;
+        overlay.className = "draw-showcase";
+        stack.className = "showcase-stack";
+        showcase.className = "showcase-card";
+        if (options.holdMs) showcase.classList.add("hold-showcase");
+        caption.className = "showcase-caption";
+        caption.textContent = options.caption || "";
+        caption.hidden = !options.caption;
+        front.alt = alt;
+        back.alt = "";
+        front.draggable = false;
+        back.draggable = false;
+        back.className = "showcase-back";
+        const frontCandidates = options.hidden ? numberBackImageCandidates : card.imageCandidates;
+        setResilientImage(front, frontCandidates, alt);
+        setResilientImage(back, numberBackImageCandidates, "数字牌背面");
+        showcase.append(front, back);
+        stack.append(caption, showcase);
+        overlay.appendChild(stack);
+        document.body.appendChild(overlay);
+
+        let done = false;
+        const cleanup = () => {
+          if (done) return;
+          done = true;
+          overlay.remove();
+          resolve();
+        };
+        if (options.holdMs) {
+          setTimeout(() => stack.classList.add("ash-out"), options.holdMs);
+          setTimeout(cleanup, options.holdMs + 900);
+        } else {
+          showcase.addEventListener("animationend", cleanup, { once: true });
+          setTimeout(cleanup, 1500);
+        }
+      });
+    }
+
+    function wait(ms) {
+      return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
+    function hearts(count) {
+      return "❤".repeat(count) + "♡".repeat(maxLives - count);
+    }
+
+    function visibleDealerScore() {
+      if (!state.dealer.length) return "?";
+      const visibleCards = state.dealer.filter((_, index) => index !== 1);
+      return `${handValue(visibleCards).total}+?`;
+    }
+  </script>
+</body>
+</html>
